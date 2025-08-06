@@ -1,7 +1,7 @@
 <template>
-    <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-600 sticky top-0 z-50">
+    <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-600 sticky top-0 z-[99999]">
         <div class="container-extra-wide">
-            <div class="flex items-center justify-between h-12 xs:h-14 sm:h-16 px-1 xs:px-2 sm:px-4 gap-2 sm:gap-4 overflow-hidden">
+            <div class="flex items-center justify-between h-12 xs:h-14 sm:h-16 px-1 xs:px-2 sm:px-4 gap-2 sm:gap-4">
                 <!-- Logo and Navigation -->
                 <div class="flex items-center space-x-2 xs:space-x-3 sm:space-x-6 flex-shrink-0 min-w-0 max-w-[60%] lg:max-w-none">
                     <NuxtLink to="/" class="flex items-center space-x-1 xs:space-x-1.5 sm:space-x-2 min-w-0">
@@ -230,7 +230,7 @@
                         <!-- User Dropdown Menu -->
                         <div
                             v-if="showUserMenu && authStore?.isAuthenticated"
-                            class="absolute right-0 mt-2 w-56 sm:w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-[9999]"
+                            class="absolute right-0 mt-2 w-56 sm:w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
                             data-testid="user-menu"
                         >
                             <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 rounded-t-lg border-b border-gray-200 dark:border-gray-700">
@@ -340,7 +340,7 @@
 
                         <div
                             v-if="isCategoryDropdownOpen"
-                            class="absolute left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-50 max-h-48 overflow-y-auto"
+                            class="absolute left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[9999] max-h-48 overflow-y-auto"
                         >
                             <!-- All Categories Button -->
                             <button
