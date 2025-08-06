@@ -1,9 +1,9 @@
 <template>
     <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-600 sticky top-0 z-50">
         <div class="container-extra-wide">
-            <div class="flex items-center justify-between h-12 xs:h-14 sm:h-16 px-1 xs:px-2 sm:px-4">
+            <div class="flex items-center justify-between h-12 xs:h-14 sm:h-16 px-1 xs:px-2 sm:px-4 gap-2 sm:gap-4 overflow-hidden">
                 <!-- Logo and Navigation -->
-                <div class="flex items-center space-x-1 xs:space-x-2 sm:space-x-4 flex-shrink-0 min-w-0">
+                <div class="flex items-center space-x-2 xs:space-x-3 sm:space-x-6 flex-shrink-0 min-w-0 max-w-[60%] lg:max-w-none">
                     <NuxtLink to="/" class="flex items-center space-x-1 xs:space-x-1.5 sm:space-x-2 min-w-0">
                         <div
                             class="w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md flex-shrink-0"
@@ -16,7 +16,7 @@
                     </NuxtLink>
 
                     <!-- Desktop Navigation -->
-                    <nav class="hidden md:flex space-x-2 xl:space-x-3 2xl:space-x-4">
+                    <nav class="hidden md:flex space-x-6 lg:space-x-8 xl:space-x-10 2xl:space-x-12">
                         <NuxtLink
                             to="/"
                             class="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium transition-colors"
@@ -50,9 +50,9 @@
                 </div>
 
                 <!-- Search and Actions -->
-                <div class="flex items-center space-x-0.5 xs:space-x-1 sm:space-x-2 flex-shrink min-w-0">
+                <div class="flex items-center space-x-2 sm:space-x-3 lg:space-x-4 flex-shrink-0 min-w-0 max-w-[40%] lg:max-w-none">
                     <!-- Search Bar -->
-                    <div v-if="!props.hideSearchAndFilter" class="hidden sm:flex items-center space-x-1 lg:space-x-2 min-w-0">
+                    <div v-if="!props.hideSearchAndFilter" class="hidden sm:flex items-center space-x-2 lg:space-x-3 min-w-0 mr-2 lg:mr-4 flex-1">
                         <!-- Category Dropdown -->
                         <div class="relative flex-shrink-0" ref="categoryDropdown">
                             <button
@@ -173,7 +173,7 @@
                         </div>
 
                         <!-- Search Input -->
-                        <div class="relative flex-1 min-w-0">
+                        <div class="relative flex-1 min-w-0 max-w-[180px] lg:max-w-[250px]">
                             <div class="absolute inset-y-0 left-0 pl-2 lg:pl-3 flex items-center pointer-events-none">
                                 <MagnifyingGlassIcon class="h-4 w-4 lg:h-5 lg:w-5 text-gray-400" />
                             </div>
@@ -183,7 +183,7 @@
                                 @input="updateSearch"
                                 placeholder="Search anime..."
                                 title="Advanced Search: Search across title, title_english, release_file_name, and submitter_name"
-                                class="block w-full pl-7 lg:pl-10 pr-2 lg:pr-3 py-1.5 lg:py-2 border border-gray-200 dark:border-gray-700 rounded-md leading-5 bg-white dark:bg-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-xs lg:text-sm text-gray-900 dark:text-white min-w-[120px] lg:min-w-[180px] max-w-[200px] lg:max-w-[250px]"
+                                class="block w-full pl-7 lg:pl-10 pr-2 lg:pr-3 py-1.5 lg:py-2 border border-gray-200 dark:border-gray-700 rounded-md leading-5 bg-white dark:bg-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-xs lg:text-sm text-gray-900 dark:text-white"
                                 data-testid="search-input"
                             />
                         </div>
@@ -192,7 +192,7 @@
                     <!-- Theme Toggle -->
                     <button
                         @click="toggleTheme"
-                        class="p-1 xs:p-1.5 sm:p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 flex-shrink-0"
+                        class="p-1.5 xs:p-2 sm:p-2.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 flex-shrink-0 ml-1 sm:ml-2"
                         aria-label="Toggle theme"
                         data-testid="theme-toggle"
                     >
@@ -201,7 +201,7 @@
                     </button>
 
                     <!-- User Menu (Desktop) -->
-                    <div class="hidden sm:block relative flex-shrink-0" ref="userMenuDropdown">
+                    <div class="hidden sm:block relative flex-shrink-0 ml-1 lg:ml-2" ref="userMenuDropdown">
                         <button
                             v-if="authStore?.isAuthenticated"
                             @click="showUserMenu = !showUserMenu"
@@ -210,22 +210,22 @@
                         >
                             <UserCircleIcon class="h-5 w-5 lg:h-6 lg:w-6" />
                         </button>
-                        <NuxtLink
-                            v-else
-                            to="/login"
-                            class="inline-flex items-center px-2 lg:px-3 py-1.5 lg:py-2 border border-transparent text-xs lg:text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors mr-1 lg:mr-2"
-                            data-testid="login-button"
-                        >
-                            Login
-                        </NuxtLink>
-                        <NuxtLink
-                            v-if="!authStore?.isAuthenticated"
-                            to="/register"
-                            class="inline-flex items-center px-2 lg:px-3 py-1.5 lg:py-2 border border-transparent text-xs lg:text-sm font-medium rounded-lg shadow-sm text-gray-800 dark:text-white bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
-                            data-testid="register-button"
-                        >
-                            Register
-                        </NuxtLink>
+                        <div v-if="!authStore?.isAuthenticated" class="flex items-center space-x-2">
+                            <NuxtLink
+                                to="/login"
+                                class="inline-flex items-center px-2 lg:px-3 py-1.5 lg:py-2 border border-transparent text-xs lg:text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                                data-testid="login-button"
+                            >
+                                Login
+                            </NuxtLink>
+                            <NuxtLink
+                                to="/register"
+                                class="inline-flex items-center px-2 lg:px-3 py-1.5 lg:py-2 border border-transparent text-xs lg:text-sm font-medium rounded-lg shadow-sm text-gray-800 dark:text-white bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                                data-testid="register-button"
+                            >
+                                Register
+                            </NuxtLink>
+                        </div>
 
                         <!-- User Dropdown Menu -->
                         <div
@@ -271,7 +271,7 @@
                     <!-- Mobile menu button -->
                     <button
                         @click="showMobileMenu = !showMobileMenu"
-                        class="md:hidden p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors flex-shrink-0"
+                        class="md:hidden p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors flex-shrink-0 ml-1 sm:ml-2"
                         aria-label="Open menu"
                         data-testid="mobile-menu-button"
                     >
