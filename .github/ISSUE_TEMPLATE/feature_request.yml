@@ -1,0 +1,49 @@
+name: Permintaan Fitur
+description: Ajukan ide atau fitur baru untuk membuat proyek ini lebih baik.
+title: "[Feature] <Deskripsi singkat fitur>"
+labels: ["feature", "needs-discussion"]
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Terima kasih telah berbagi ide dengan kami!
+
+    - type: textarea
+      id: problem-description
+      attributes:
+          label: Apakah permintaan fitur Anda terkait dengan suatu masalah?
+          description: Jelaskan masalah atau frustrasi yang Anda alami.
+          placeholder: "Contoh: Saat ini, saya kesulitan menambahkan banyak link download sekaligus karena harus meng-klik tombol 'Tambah' berulang kali."
+      validations:
+          required: true
+
+    - type: textarea
+      id: solution-description
+      attributes:
+          label: Jelaskan solusi yang Anda inginkan
+          description: Jelaskan bagaimana fitur baru ini akan bekerja dan menyelesaikan masalah yang Anda sebutkan di atas.
+          placeholder: Saya ingin ada tombol "Impor Link dari Teks" di mana saya bisa menyalin-tempel daftar link, dan sistem akan secara otomatis memisahkannya menjadi beberapa baris input.
+      validations:
+          required: true
+
+    - type: textarea
+      id: alternatives
+      attributes:
+          label: Jelaskan alternatif yang pernah Anda pertimbangkan
+          description: Adakah solusi atau cara kerja lain yang pernah Anda pikirkan?
+
+    - type: textarea
+      id: mockups
+      attributes:
+          label: Konteks Tambahan atau Mockup
+          description: Tambahkan konteks lain, screenshot, atau mockup sederhana untuk memperjelas ide Anda. Ini sangat membantu!
+
+    - type: checkboxes
+      id: checklist
+      attributes:
+          label: Checklist Pra-pengiriman
+          options:
+              - label: Saya sudah mencari di daftar issue dan tidak menemukan permintaan fitur yang sama.
+                required: true
+              - label: Saya yakin fitur ini sejalan dengan visi utama proyek.
+                required: true

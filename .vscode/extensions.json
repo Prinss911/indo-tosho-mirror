@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "howardzuo.vscode-npm-dependency",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "Vue.volar"
+    ]
+}

@@ -1,0 +1,10 @@
+name = "indo-tosho"
+compatibility_date = "2025-05-15"
+pages_build_output_dir = "dist"
+
+[vars]
+NODE_VERSION = "22"
+NITRO_PRESET = "cloudflare-pages"
+
+NUXT_PUBLIC_SUPABASE_URL = "https://jayavvymuqkkvvlcaudv.supabase.co"
+NUXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpheWF2dnltdXFra3Z2bGNhdWR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MDQ3ODgsImV4cCI6MjA2Nzk4MDc4OH0.sJBe0uaHUg3W15MtLfT7pe75LZxi5FGtygSRYHFW9tw"

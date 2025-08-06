@@ -1,0 +1,41 @@
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+
+# Node dependencies
+node_modules
+
+# Logs
+logs
+*.log
+
+# Misc
+.DS_Store
+.fleet
+.idea
+
+# Local env files
+.env
+.env.*
+!.env.example
+
+# Package Manager Lockfiles
+# We standardize on npm's package-lock.json, so ignore others.
+bun.lock
+yarn.lock
+pnpm-lock.yaml
+
+# Test & Build Artifacts
+test_output.txt
+coverage/
+junit.xml
+.wrangler/tmp
+
+# Local env files
+.env
+.env.*
+!.env.example

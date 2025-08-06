@@ -1,0 +1,65 @@
+name: Laporan Bug
+description: Laporkan bug atau masalah yang Anda temukan agar bisa kami perbaiki.
+title: "[Bug] <Deskripsi singkat bug>"
+labels: ["bug", "needs-triage"]
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Terima kasih telah meluangkan waktu untuk mengisi laporan bug ini! Informasi yang detail akan sangat membantu kami memperbaikinya lebih cepat.
+
+    - type: textarea
+      id: bug-description
+      attributes:
+          label: Deskripsi Bug
+          description: Jelaskan dengan jelas dan ringkas apa masalahnya.
+          placeholder: "Contoh: Halaman admin tidak menampilkan daftar pengguna setelah login."
+      validations:
+          required: true
+
+    - type: textarea
+      id: steps-to-reproduce
+      attributes:
+          label: Langkah-langkah untuk Mereproduksi
+          description: Jelaskan langkah demi langkah bagaimana cara kami bisa mengalami bug yang sama.
+          placeholder: |
+              1. Buka halaman `/login`
+              2. Masukkan kredensial sebagai admin
+              3. Arahkan ke `/admin/users`
+              4. Halaman kosong dan muncul error di console...
+      validations:
+          required: true
+
+    - type: textarea
+      id: expected-behavior
+      attributes:
+          label: Apa yang Seharusnya Terjadi?
+          description: Jelaskan apa hasil yang Anda harapkan.
+          placeholder: Seharusnya halaman menampilkan tabel berisi daftar semua pengguna.
+      validations:
+          required: true
+
+    - type: textarea
+      id: screenshots
+      attributes:
+          label: Screenshot atau Log Error
+          description: Jika memungkinkan, tambahkan screenshot atau salin-tempel log error dari console browser untuk membantu menjelaskan masalah.
+          placeholder: Anda bisa drag & drop gambar atau menyalin log di sini.
+
+    - type: input
+      id: browser
+      attributes:
+          label: Browser & Versi
+          description: Browser apa yang Anda gunakan?
+          placeholder: "Contoh: Chrome 125, Firefox 124"
+
+    - type: checkboxes
+      id: checklist
+      attributes:
+          label: Checklist Pra-pengiriman
+          description: Pastikan Anda telah melakukan hal-hal berikut.
+          options:
+              - label: Saya sudah mencari di daftar issue yang ada dan tidak menemukan bug yang sama.
+                required: true
+              - label: Laporan ini hanya berisi satu bug. Jika ada bug lain, saya akan membuat laporan terpisah.
+                required: true

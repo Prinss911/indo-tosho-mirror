@@ -1,0 +1,47 @@
+name: Tugas Teknis / Refactor
+description: Untuk tugas teknis internal, refactoring, atau perbaikan arsitektur.
+title: "[Core] <Deskripsi singkat tugas teknis>"
+labels: ["core", "refactor"]
+body:
+    - type: textarea
+      id: goal
+      attributes:
+          label: Apa tujuan dari tugas ini?
+          description: Jelaskan secara singkat apa yang ingin dicapai.
+          placeholder: "Contoh: Mengimplementasikan arsitektur Otentikasi Hybrid."
+      validations:
+          required: true
+
+    - type: textarea
+      id: justification
+      attributes:
+          label: Mengapa perubahan ini diperlukan?
+          description: Jelaskan alasan teknis atau strategis di balik tugas ini.
+          placeholder: "Contoh: Untuk mempercepat development auth dan menghindari vendor lock-in untuk database utama."
+      validations:
+          required: true
+
+    - type: textarea
+      id: acceptance-criteria
+      attributes:
+          label: Acceptance Criteria / Definition of Done
+          description: Buat daftar tugas spesifik dalam format checklist yang harus diselesaikan agar issue ini dianggap "Selesai".
+          value: |
+              - [ ] 
+              - [ ] 
+              - [ ]
+      validations:
+          required: true
+
+    - type: input
+      id: affected-files
+      attributes:
+          label: Komponen/File yang Mungkin Terpengaruh
+          description: Sebutkan file atau direktori utama yang akan diubah.
+          placeholder: "Contoh: pages/login.vue, stores/auth.ts, server/middleware/"
+
+    - type: textarea
+      id: technical-notes
+      attributes:
+          label: Catatan Teknis atau Pertimbangan
+          description: Adakah detail implementasi, potensi masalah, atau link dokumentasi yang relevan?

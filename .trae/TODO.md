@@ -1,0 +1,12 @@
+# TODO:
+
+- [x] 1: Analisis error validasi di validateAndSanitizePostData dan identifikasi field yang bermasalah (priority: High)
+- [x] 2: Tambahkan logging detail untuk debugging validation errors dengan informasi field spesifik (priority: High)
+- [x] 6: Perbaiki handling field title yang menerima nilai undefined/null (priority: High)
+- [x] 7: Update regex pattern untuk title agar mendukung karakter Unicode dan emoji (priority: High)
+- [x] 3: Perbaiki handling untuk field optional yang mungkin undefined/null (priority: Medium)
+- [x] 4: Improve error response untuk memberikan informasi field spesifik yang bermasalah (priority: Medium)
+- [x] 5: Test perbaikan validasi dengan data yang menyebabkan error sebelumnya (priority: Medium)
+- [x] 8: Tambahkan pre-check validation sebelum regex validation (priority: Medium)
+- [x] 9: Test perbaikan dengan data yang menyebabkan error sebelumnya (priority: Medium)
+- [x] 10: Perbaiki handling untuk array fields (downloadLinks, genres) yang mungkin undefined (priority: Medium)
