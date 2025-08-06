@@ -88,12 +88,7 @@
                             >
                                 Title
                             </th>
-                            <th
-                                scope="col"
-                                class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32"
-                            >
-                                Info
-                            </th>
+
 
                             <th
                                 scope="col"
@@ -153,11 +148,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                <div class="space-y-1">
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ anime.episodes }} eps</div>
-                                </div>
-                            </td>
+
 
                             <td
                                 class="px-3 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white"
@@ -235,9 +226,6 @@
                             <div
                                 class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400"
                             >
-
-                                <span>{{ anime.episodes ?? "N/A" }} eps</span>
-
                                 <div>
                                     <span>{{ formatDate(anime.created_at || anime.date) }}</span>
                                     <span class="text-xs text-gray-400 ml-1">{{
