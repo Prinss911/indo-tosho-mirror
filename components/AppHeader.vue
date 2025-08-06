@@ -16,7 +16,7 @@
                     </NuxtLink>
 
                     <!-- Desktop Navigation -->
-                    <nav class="hidden lg:flex space-x-2 xl:space-x-3 2xl:space-x-4">
+                    <nav class="hidden md:flex space-x-2 xl:space-x-3 2xl:space-x-4">
                         <NuxtLink
                             to="/"
                             class="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium transition-colors"
@@ -37,13 +37,6 @@
                             active-class="text-blue-600 dark:text-blue-400"
                         >
                             Top Rated
-                        </NuxtLink>
-                        <NuxtLink
-                            to="/latest"
-                            class="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium transition-colors"
-                            active-class="text-blue-600 dark:text-blue-400"
-                        >
-                            Latest
                         </NuxtLink>
                         <NuxtLink
                             v-if="authStore?.isAuthenticated"
@@ -278,7 +271,7 @@
                     <!-- Mobile menu button -->
                     <button
                         @click="showMobileMenu = !showMobileMenu"
-                        class="sm:hidden p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors flex-shrink-0"
+                        class="md:hidden p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors flex-shrink-0"
                         aria-label="Open menu"
                         data-testid="mobile-menu-button"
                     >
@@ -289,7 +282,7 @@
             </div>
 
             <!-- Mobile Menu -->
-            <div v-if="showMobileMenu" class="sm:hidden py-2 border-t border-gray-200 dark:border-gray-700">
+            <div v-if="showMobileMenu" class="md:hidden py-2 border-t border-gray-200 dark:border-gray-700">
                 <div class="space-y-1 px-2">
                     <NuxtLink
                         to="/"
@@ -315,14 +308,7 @@
                     >
                         Top Rated
                     </NuxtLink>
-                    <NuxtLink
-                        to="/latest"
-                        class="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                        active-class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
-                        @click="showMobileMenu = false"
-                    >
-                        Latest
-                    </NuxtLink>
+
                     <NuxtLink
                         v-if="authStore?.isAuthenticated"
                         to="/posts"
