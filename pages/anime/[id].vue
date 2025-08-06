@@ -761,7 +761,7 @@ useHead(() => ({
             name: "description",
             content: anime.value
                 ? ((anime.value as any).description ??
-                  `Watch ${(anime.value as any).releaseFileName ?? (anime.value as any).title} - ${(anime.value as any).genre?.length ? (anime.value as any).genre.join(", ") : ""}${(anime.value as any).studio ? ` anime from ${(anime.value as any).studio}` : ""}`
+                  `Watch ${(anime.value as any).releaseFileName ?? (anime.value as any).title} - ${(anime.value as any).genre?.length ? (anime.value as any).genre.join(", ") : ""}${(anime.value as any).studio ? ` anime from ${(anime.value as any).studio}` : ""}`)
                 : "Anime details page"
         },
         {
