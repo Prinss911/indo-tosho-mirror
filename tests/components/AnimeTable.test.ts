@@ -151,13 +151,17 @@ describe("AnimeTable", () => {
     beforeEach(() => {
         wrapper = createWrapper();
         store = useAnimeStore();
-        // Tambahkan mock untuk fungsi getLegacyCategoryFromId
-        store.getLegacyCategoryFromId = vi.fn().mockReturnValue("Action");
+        // Tambahkan mock untuk fungsi getLegacyCategoryFromId dengan validasi parameter
+        store.getLegacyCategoryFromId = vi.fn().mockImplementation((categoryId) => {
+            // Pastikan selalu mengembalikan string yang valid
+            if (!categoryId) return "Unknown";
+            return "Anime - Sudah diterjemahkan"; // Gunakan kategori yang ada di getCategoryColor
+        });
         // Tambahkan mock untuk properti categories
         store.categories = [
             { id: "all", name: "Semua Kategori" },
-            { id: "cat-1", name: "Action" },
-            { id: "cat-2", name: "Comedy" }
+            { id: "cat-1", name: "Anime - Sudah diterjemahkan" },
+            { id: "cat-2", name: "Audio - Lossless" }
         ];
     });
 

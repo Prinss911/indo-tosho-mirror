@@ -342,27 +342,76 @@ const navigateToDetail = (id: string) => {
 };
 
 const getCategoryColor = (category: string) => {
+    // Validasi parameter category
+    if (!category || typeof category !== 'string') {
+        return "bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow-lg border border-gray-200";
+    }
+    
+    // Ekstrak kategori utama dan subkategori dari format "Kategori - Subkategori"
+    const [mainCategory, subCategory] = category.split(' - ').map(c => c.trim());
+    
     const colors: Record<string, string> = {
-        // Main categories with gradients and modern colors
-        Anime: "bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg border border-pink-200",
-        Audio: "bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg border border-purple-200",
-        Literature: "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg border border-emerald-200",
+        // Main categories dengan warna dasar
+        "Anime": "bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg border border-pink-200",
+        "Audio": "bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg border border-purple-200",
+        "Literature": "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg border border-emerald-200",
         "Live Action": "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg border border-blue-200",
-        Pictures: "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg border border-orange-200",
-        Software: "bg-gradient-to-r from-gray-600 to-slate-600 text-white shadow-lg border border-gray-200",
+        "Pictures": "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg border border-orange-200",
+        "Software": "bg-gradient-to-r from-gray-600 to-slate-600 text-white shadow-lg border border-gray-200",
+        
+        // Anime subcategories dengan variasi warna pink/rose
+        "Anime - Sudah diterjemahkan": "bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow-lg border border-pink-300",
+        "Anime - Anime Music Video": "bg-gradient-to-r from-pink-400 to-rose-400 text-white shadow-lg border border-pink-200",
+        "Anime - Selain Terjemahan Indonesia": "bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-lg border border-rose-200",
+        "Anime - Raw": "bg-gradient-to-r from-pink-700 to-rose-700 text-white shadow-lg border border-pink-400",
+        
+        // Audio subcategories dengan variasi warna purple/indigo
+        "Audio - Lossless": "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg border border-purple-300",
+        "Audio - Lossy": "bg-gradient-to-r from-purple-400 to-indigo-400 text-white shadow-lg border border-purple-200",
+        
+        // Literature subcategories dengan variasi warna emerald/teal
+        "Literature - Sudah diterjemahkan": "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg border border-emerald-300",
+        "Literature - Selain Terjemahan Indonesia": "bg-gradient-to-r from-emerald-400 to-teal-400 text-white shadow-lg border border-emerald-200",
+        "Literature - Raw": "bg-gradient-to-r from-emerald-700 to-teal-700 text-white shadow-lg border border-emerald-400",
+        
+        // Live Action subcategories dengan variasi warna blue/cyan
+        "Live Action - Sudah diterjemahkan": "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg border border-blue-300",
+        "Live Action - Idol/Promotional Video": "bg-gradient-to-r from-blue-400 to-cyan-400 text-white shadow-lg border border-blue-200",
+        "Live Action - Selain Terjemahan Indonesia": "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg border border-cyan-200",
+        "Live Action - Raw": "bg-gradient-to-r from-blue-700 to-cyan-700 text-white shadow-lg border border-blue-400",
+        
+        // Pictures subcategories dengan variasi warna orange/amber
+        "Pictures - Graphics": "bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg border border-orange-300",
+        "Pictures - Photos": "bg-gradient-to-r from-orange-400 to-amber-400 text-white shadow-lg border border-orange-200",
+        
+        // Software subcategories dengan variasi warna gray/slate
+        "Software - Applications": "bg-gradient-to-r from-gray-700 to-slate-700 text-white shadow-lg border border-gray-300",
+        "Software - Games": "bg-gradient-to-r from-gray-500 to-slate-500 text-white shadow-lg border border-gray-200",
 
-        // Legacy categories for backward compatibility
-        Action: "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg border border-red-200",
-        Adventure: "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg border border-green-200",
-        Comedy: "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg border border-yellow-200",
-        Drama: "bg-gradient-to-r from-purple-500 to-violet-500 text-white shadow-lg border border-purple-200",
-        Fantasy: "bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg border border-pink-200",
-        Romance: "bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg border border-rose-200",
+        // Legacy categories untuk backward compatibility
+        "Action": "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg border border-red-200",
+        "Adventure": "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg border border-green-200",
+        "Comedy": "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg border border-yellow-200",
+        "Drama": "bg-gradient-to-r from-purple-500 to-violet-500 text-white shadow-lg border border-purple-200",
+        "Fantasy": "bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg border border-pink-200",
+        "Romance": "bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg border border-rose-200",
         "Sci-Fi": "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg border border-blue-200",
         "Slice of Life": "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg border border-indigo-200",
-        Thriller: "bg-gradient-to-r from-gray-500 to-zinc-500 text-white shadow-lg border border-gray-200"
+        "Thriller": "bg-gradient-to-r from-gray-500 to-zinc-500 text-white shadow-lg border border-gray-200"
     };
-    return colors[category] ?? "bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow-lg border border-gray-200";
+    
+    // Coba cari warna berdasarkan kategori lengkap terlebih dahulu
+    if (colors[category]) {
+        return colors[category];
+    }
+    
+    // Jika tidak ditemukan, coba cari berdasarkan kategori utama saja
+    if (mainCategory && colors[mainCategory]) {
+        return colors[mainCategory];
+    }
+    
+    // Default color jika tidak ditemukan
+    return "bg-gradient-to-r from-gray-400 to-gray-500 text-white shadow-lg border border-gray-200";
 };
 
 const formatDate = (dateString: string | null | undefined) => {
