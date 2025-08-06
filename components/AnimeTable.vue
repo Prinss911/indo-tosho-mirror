@@ -318,7 +318,7 @@ const updateSort = (field?: string) => {
             sortOrder.value = sortOrder.value === "asc" ? "desc" : "asc";
         } else {
             // Jika field berbeda, atur sortBy baru dan reset sortOrder ke asc
-            sortBy.value = field;
+            sortBy.value = field as "date" | "title" | "rating" | "downloads";
             sortOrder.value = "asc";
         }
     }

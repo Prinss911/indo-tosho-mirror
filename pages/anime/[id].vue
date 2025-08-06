@@ -703,14 +703,14 @@ const newComment = ref({
 const showPreview = ref(false);
 
 // Markdown parser instance
-let marked = null;
+let marked: any = null;
 
 // Load marked.js from CDN
 if (process.client) {
     const script = document.createElement("script");
     script.src = "https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js";
     script.onload = () => {
-        marked = window.marked;
+        marked = (window as any).marked;
         // Configure marked options
         marked.setOptions({
             breaks: true,
@@ -736,7 +736,7 @@ async function fetchAnimeData() {
     try {
         const result = await animeStore.getAnimeById(id);
         const found = result !== undefined && result !== null;
-        animeData.value = result;
+        animeData.value = result as Anime | null;
 
         // If no result found, return false to indicate we need to fetch again
         return found;
@@ -754,20 +754,20 @@ const anime = computed(() => animeData.value);
 // Meta tags
 useHead(() => ({
     title: anime.value
-        ? `${anime.value.releaseFileName ?? anime.value.title} - Anime Database`
+        ? `${(anime.value as any).releaseFileName ?? (anime.value as any).title} - Anime Database`
         : "Anime Details - Anime Database",
     meta: [
         {
             name: "description",
             content: anime.value
-                ? (anime.value.description ??
-                  `Watch ${anime.value.releaseFileName ?? anime.value.title} - ${anime.value.genre?.length ? anime.value.genre.join(", ") : ""}${anime.value.studio ? ` anime from ${anime.value.studio}` : ""}`)
+                ? ((anime.value as any).description ??
+                  `Watch ${(anime.value as any).releaseFileName ?? (anime.value as any).title} - ${(anime.value as any).genre?.length ? (anime.value as any).genre.join(", ") : ""}${(anime.value as any).studio ? ` anime from ${(anime.value as any).studio}` : ""}`
                 : "Anime details page"
         },
         {
             property: "og:title",
             content: anime.value
-                ? `${anime.value.releaseFileName ?? anime.value.title} - Anime Database`
+                ? `${(anime.value as any).releaseFileName ?? (anime.value as any).title} - Anime Database`
                 : "Anime Details"
         },
         {

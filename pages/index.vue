@@ -189,8 +189,8 @@ const currentNotification = ref(null);
 const fetchCurrentNotification = async () => {
     try {
         const response = await $fetch("/api/admin/notifications");
-        if (response.success && response.data) {
-            currentNotification.value = response.data;
+        if (response && 'data' in response && response.success) {
+            currentNotification.value = response.data as null;
         } else {
             currentNotification.value = null;
         }

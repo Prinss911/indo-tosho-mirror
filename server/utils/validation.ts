@@ -257,7 +257,7 @@ export function validateAndSanitizePostData(data: any, isUpdate: boolean = false
                     return genre;
                 }
                 return sanitizeHtml(genre.trim());
-            }).filter(genre => genre && genre.length > 0); // Remove empty genres
+            }).filter((genre: string) => genre && genre.length > 0); // Remove empty genres
         })()
     };
 

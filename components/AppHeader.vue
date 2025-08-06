@@ -642,7 +642,7 @@ onMounted(async () => {
             console.log("Direct DB check - profile data:", data);
             console.log("Direct DB check - profile error:", error);
 
-            if (data && data.role === "admin") {
+            if (data && typeof data === 'object' && data !== null && 'role' in data && (data as { role: string }).role === "admin") {
                 isAdminUser.value = true;
                 // Force update the authStore user role
                 if (authStore.user) {
@@ -678,7 +678,7 @@ watch(
                 console.log("Direct DB check (watch) - profile data:", data);
                 console.log("Direct DB check (watch) - profile error:", error);
 
-                if (data && data.role === "admin") {
+                if (data && typeof data === 'object' && data && 'role' in (data as {role?: string}) && (data as {role: string}).role === "admin") {
                     isAdminUser.value = true;
                     // Force update the authStore user role
                     if (authStore.user) {
