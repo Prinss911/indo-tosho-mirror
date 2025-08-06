@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
-import { nextTick } from "vue";
+import { nextTick, markRaw } from "vue";
 import AdminPostsPage from "~/pages/admin/posts.vue";
 import { useApi } from "~/composables/useApi";
 import { useAnimeStore } from "~/stores/anime";
@@ -219,9 +219,14 @@ describe("Admin Posts Page", () => {
 
     describe("Component Rendering", () => {
         it("should render page title and statistics", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -241,9 +246,14 @@ describe("Admin Posts Page", () => {
         });
 
         it("should render filter and search controls", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -267,9 +277,14 @@ describe("Admin Posts Page", () => {
         });
 
         it("should render posts table", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -288,9 +303,14 @@ describe("Admin Posts Page", () => {
         });
 
         it("should render post rows with data", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -314,9 +334,14 @@ describe("Admin Posts Page", () => {
 
     describe("Statistics Display", () => {
         it("should calculate and display correct statistics", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -335,9 +360,14 @@ describe("Admin Posts Page", () => {
         });
 
         it("should update statistics when posts change", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -385,9 +415,14 @@ describe("Admin Posts Page", () => {
 
     describe("Filtering and Search", () => {
         it("should filter posts by search term", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -409,9 +444,14 @@ describe("Admin Posts Page", () => {
         });
 
         it("should filter posts by status", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -433,9 +473,14 @@ describe("Admin Posts Page", () => {
         });
 
         it("should filter posts by category", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -457,9 +502,14 @@ describe("Admin Posts Page", () => {
         });
 
         it("should filter posts by author email", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -481,9 +531,14 @@ describe("Admin Posts Page", () => {
         });
 
         it("should combine multiple filters", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -507,9 +562,14 @@ describe("Admin Posts Page", () => {
         });
 
         it("should clear filters", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -540,9 +600,14 @@ describe("Admin Posts Page", () => {
 
     describe("Sorting", () => {
         it("should sort posts by title", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -565,9 +630,14 @@ describe("Admin Posts Page", () => {
         });
 
         it("should sort posts by date", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -590,9 +660,14 @@ describe("Admin Posts Page", () => {
         });
 
         it("should change sort option", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -618,9 +693,14 @@ describe("Admin Posts Page", () => {
 
     describe("Post Actions", () => {
         it("should approve a post", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -641,9 +721,14 @@ describe("Admin Posts Page", () => {
         });
 
         it("should reject a post", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -667,9 +752,14 @@ describe("Admin Posts Page", () => {
             // Mock window.confirm to return true
             global.confirm = vi.fn().mockReturnValue(true);
 
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -694,9 +784,14 @@ describe("Admin Posts Page", () => {
             global.console.error = vi.fn();
             global.alert = vi.fn();
 
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -721,9 +816,14 @@ describe("Admin Posts Page", () => {
             // Mock window.confirm
             const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
 
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
+                    provide: {
+                        router: {
+                            push: mockPush
+                        }
+                    },
                     mocks: {
                         $router: {
                             push: mockPush
@@ -748,7 +848,7 @@ describe("Admin Posts Page", () => {
             // Mock window.confirm to return false
             const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
 
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {
@@ -774,7 +874,7 @@ describe("Admin Posts Page", () => {
 
     describe("Data Loading", () => {
         it("should load posts on mount", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {
@@ -794,7 +894,7 @@ describe("Admin Posts Page", () => {
         });
 
         it("should show loading state", () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {
@@ -810,7 +910,7 @@ describe("Admin Posts Page", () => {
         });
 
         it("should hide loading state after data loads", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {
@@ -831,7 +931,7 @@ describe("Admin Posts Page", () => {
         it("should handle loading errors", async () => {
             mockApi.getAllPosts.mockRejectedValue(new Error("Load error"));
 
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {
@@ -869,7 +969,7 @@ describe("Admin Posts Page", () => {
 
             mockApi.getAllPosts.mockResolvedValue(manyPosts);
 
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {
@@ -906,7 +1006,7 @@ describe("Admin Posts Page", () => {
 
             mockApi.getAllPosts.mockResolvedValue(manyPosts);
 
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {
@@ -951,7 +1051,7 @@ describe("Admin Posts Page", () => {
 
             mockApi.getAllPosts.mockResolvedValue(manyPosts);
 
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {
@@ -974,7 +1074,7 @@ describe("Admin Posts Page", () => {
 
     describe("User Interface", () => {
         it("should show action buttons for appropriate post statuses", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {
@@ -994,7 +1094,7 @@ describe("Admin Posts Page", () => {
         });
 
         it("should disable action buttons during loading", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {
@@ -1020,7 +1120,7 @@ describe("Admin Posts Page", () => {
         it("should show empty state when no posts", async () => {
             mockApi.getAllPosts.mockResolvedValue([]);
 
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -1037,7 +1137,7 @@ describe("Admin Posts Page", () => {
         it("should show error message on API failure", async () => {
             mockApi.getAllPosts.mockRejectedValue(new Error("API Error"));
 
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -1053,7 +1153,7 @@ describe("Admin Posts Page", () => {
 
     describe("Accessibility", () => {
         it("should have proper card list structure", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {
@@ -1072,7 +1172,7 @@ describe("Admin Posts Page", () => {
         });
 
         it("should have proper form labels", () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {
@@ -1088,7 +1188,7 @@ describe("Admin Posts Page", () => {
         });
 
         it("should have proper button labels", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {
@@ -1120,7 +1220,7 @@ describe("Admin Posts Page", () => {
 
     describe("Performance", () => {
         it("should not re-fetch data unnecessarily", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {
@@ -1145,7 +1245,7 @@ describe("Admin Posts Page", () => {
         });
 
         it("should debounce search input", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {
@@ -1173,7 +1273,7 @@ describe("Admin Posts Page", () => {
 
     describe("Component State Management", () => {
         it("should initialize with correct default state", () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {
@@ -1192,7 +1292,7 @@ describe("Admin Posts Page", () => {
         });
 
         it("should update state correctly after successful operations", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {
@@ -1213,7 +1313,7 @@ describe("Admin Posts Page", () => {
         });
 
         it("should handle filter changes properly", async () => {
-            wrapper = mount(AdminPostsPage, {
+            wrapper = mount(markRaw(AdminPostsPage), {
                 global: {
                     plugins: [pinia],
                     mocks: {

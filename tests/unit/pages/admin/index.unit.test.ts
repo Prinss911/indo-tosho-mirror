@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
-import { nextTick } from "vue";
+import { nextTick, markRaw } from "vue";
 import { flushPromises } from "@vue/test-utils";
 import AdminIndexPage from "~/pages/admin/index.vue";
 import { useAnimeStore } from "~/stores/anime";
@@ -392,7 +392,7 @@ describe("Admin Index Page", () => {
 
     // Helper function to create wrapper with proper configuration
     const createWrapper = (options = {}) => {
-        return mount(AdminIndexPage, {
+        return mount(markRaw(AdminIndexPage), {
             global: {
                 plugins: [pinia],
                 provide: {
@@ -450,7 +450,7 @@ describe("Admin Index Page", () => {
         });
 
         it("should render navigation links", () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -482,7 +482,7 @@ describe("Admin Index Page", () => {
         });
 
         it("should display user statistics correctly", async () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -498,7 +498,7 @@ describe("Admin Index Page", () => {
         });
 
         it("should display post statistics correctly", async () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -517,7 +517,7 @@ describe("Admin Index Page", () => {
             mockAnimeStore.animes = [];
             mockAnimeStore.totalAnimes = 0;
 
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -529,7 +529,7 @@ describe("Admin Index Page", () => {
 
     describe("Computed Properties", () => {
         it("should calculate fallback stats from anime store", async () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -549,7 +549,7 @@ describe("Admin Index Page", () => {
                 { id: 2, title: "Anime 2", views: 100, downloads: 50, likes: 25 } // Partial stats
             ];
 
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -562,7 +562,7 @@ describe("Admin Index Page", () => {
         });
 
         it("should prioritize Supabase stats over fallback", async () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -580,7 +580,7 @@ describe("Admin Index Page", () => {
 
     describe("Data Loading", () => {
         it("should load data from Supabase on mount", async () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -598,7 +598,7 @@ describe("Admin Index Page", () => {
             mockAnimeStore.animes = [];
             const fetchAnimesSpy = vi.spyOn(mockAnimeStore, "fetchAnimes");
 
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -620,7 +620,7 @@ describe("Admin Index Page", () => {
                 select: vi.fn().mockResolvedValue(errorMock)
             });
 
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -645,7 +645,7 @@ describe("Admin Index Page", () => {
 
     describe("Navigation", () => {
         it("should have correct navigation links", () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -666,7 +666,7 @@ describe("Admin Index Page", () => {
         });
 
         it("should navigate to correct pages when links are clicked", async () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -682,7 +682,7 @@ describe("Admin Index Page", () => {
 
     describe("Responsive Design", () => {
         it("should render statistics cards in a responsive grid", () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -693,7 +693,7 @@ describe("Admin Index Page", () => {
         });
 
         it("should have proper CSS classes for responsive layout", () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -709,7 +709,7 @@ describe("Admin Index Page", () => {
 
     describe("Loading States", () => {
         it("should show loading state initially", () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -720,7 +720,7 @@ describe("Admin Index Page", () => {
         });
 
         it("should hide loading state after data is loaded", async () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -739,7 +739,7 @@ describe("Admin Index Page", () => {
             mockAnimeStore.filteredAnimes = [];
             mockAnimeStore.totalAnimes = 0;
 
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -762,7 +762,7 @@ describe("Admin Index Page", () => {
             });
 
             expect(() => {
-                wrapper = mount(AdminIndexPage, {
+                wrapper = mount(markRaw(AdminIndexPage), {
                     global: {
                         plugins: [pinia]
                     }
@@ -778,7 +778,7 @@ describe("Admin Index Page", () => {
 
     describe("Accessibility", () => {
         it("should have proper heading structure", () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -791,7 +791,7 @@ describe("Admin Index Page", () => {
         });
 
         it("should have proper ARIA labels for statistics", () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -805,7 +805,7 @@ describe("Admin Index Page", () => {
 
     describe("Performance", () => {
         it("should render without performance issues", async () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -820,7 +820,7 @@ describe("Admin Index Page", () => {
 
     describe("Component State", () => {
         it("should initialize with correct default state", async () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -846,7 +846,7 @@ describe("Admin Index Page", () => {
         });
 
         it("should update state after successful Supabase calls", async () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -869,7 +869,7 @@ describe("Admin Index Page", () => {
 
     describe("Integration with Stores", () => {
         it("should use anime store data correctly", () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }
@@ -881,7 +881,7 @@ describe("Admin Index Page", () => {
         });
 
         it("should use auth store for admin verification", () => {
-            wrapper = mount(AdminIndexPage, {
+            wrapper = mount(markRaw(AdminIndexPage), {
                 global: {
                     plugins: [pinia]
                 }

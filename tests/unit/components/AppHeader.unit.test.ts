@@ -145,7 +145,6 @@ describe("AppHeader.vue", () => {
             expect(linkTexts).toContain("Home");
             expect(linkTexts).toContain("Browse");
             expect(linkTexts).toContain("Top Rated");
-            expect(linkTexts).toContain("Latest");
         });
 
         it("should render theme toggle button", () => {

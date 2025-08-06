@@ -1,6 +1,6 @@
 # TODO:
 
-- [x] 61: Tingkatkan z-index user dropdown menu dari z-50 menjadi z-[9999] untuk mengatasi masalah layering (priority: High)
-- [x] 62: Periksa dan tingkatkan z-index category dropdown juga jika diperlukan (priority: Medium)
-- [x] 63: Test dropdown menu untuk memastikan muncul di atas anime table (priority: Medium)
-- [x] 64: Commit dan push perbaikan z-index yang lebih tinggi (priority: Low)
+- [x] 65: Periksa dan perbaiki Vue warning 'Component that was made a reactive object' di tests/unit/pages/admin/index.unit.test.ts (priority: High)
+- [x] 66: Periksa dan perbaiki Vue warning 'Component that was made a reactive object' di tests/unit/pages/admin/posts.unit.test.ts (priority: High)
+- [x] 67: Perbaiki router injection warning di tests/unit/pages/admin/posts.unit.test.ts (priority: Medium)
+- [x] 68: Jalankan test ulang untuk memastikan semua warning telah diperbaiki (priority: Medium)
