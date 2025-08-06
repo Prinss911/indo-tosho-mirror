@@ -1,22 +1,22 @@
 <template>
     <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-600 sticky top-0 z-50">
         <div class="container-extra-wide">
-            <div class="flex items-center justify-between h-16">
+            <div class="flex items-center justify-between h-14 sm:h-16 px-2 sm:px-4">
                 <!-- Logo and Navigation -->
-                <div class="flex items-center space-x-4">
-                    <NuxtLink to="/" class="flex items-center space-x-2">
+                <div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
+                    <NuxtLink to="/" class="flex items-center space-x-1 sm:space-x-2">
                         <div
-                            class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md"
+                            class="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md"
                         >
-                            <span class="text-white font-bold text-sm">AD</span>
+                            <span class="text-white font-bold text-xs sm:text-sm">AD</span>
                         </div>
-                        <span class="text-lg font-bold text-gray-900 dark:text-white hidden sm:block"
+                        <span class="text-base sm:text-lg font-bold text-gray-900 dark:text-white hidden sm:block"
                             >Anime Database</span
                         >
                     </NuxtLink>
 
                     <!-- Desktop Navigation -->
-                    <nav class="hidden md:flex space-x-4">
+                    <nav class="hidden lg:flex space-x-3 xl:space-x-4">
                         <NuxtLink
                             to="/"
                             class="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium transition-colors"
@@ -57,31 +57,31 @@
                 </div>
 
                 <!-- Search and Actions -->
-                <div class="flex items-center space-x-2">
+                <div class="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
                     <!-- Search Bar -->
-                    <div v-if="!props.hideSearchAndFilter" class="hidden sm:flex items-center space-x-2">
+                    <div v-if="!props.hideSearchAndFilter" class="hidden md:flex items-center space-x-2">
                         <!-- Category Dropdown -->
                         <div class="relative" ref="categoryDropdown">
                             <button
                                 @click="toggleCategoryDropdown"
-                                class="flex items-center gap-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600 border border-blue-200 dark:border-gray-600 rounded-lg px-4 py-2.5 text-sm font-medium text-blue-700 dark:text-blue-300 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-gray-600 dark:hover:to-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 min-w-[140px] shadow-sm hover:shadow-md"
+                                class="flex items-center gap-1 sm:gap-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600 border border-blue-200 dark:border-gray-600 rounded-lg px-2 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-300 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-gray-600 dark:hover:to-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 min-w-[100px] sm:min-w-[140px] shadow-sm hover:shadow-md"
                                 data-testid="category-select"
                             >
-                                <div class="flex items-center gap-2 flex-1">
-                                    <div class="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full flex-shrink-0"></div>
+                                <div class="flex items-center gap-1 sm:gap-2 flex-1">
+                                    <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-500 dark:bg-blue-400 rounded-full flex-shrink-0"></div>
                                     <span data-testid="selected-category" class="truncate font-medium">{{
                                         displaySelectedCategory
                                     }}</span>
                                 </div>
                                 <ChevronDownIcon
-                                    class="w-4 h-4 text-blue-500 dark:text-blue-400 transition-transform duration-200 flex-shrink-0"
+                                    class="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 dark:text-blue-400 transition-transform duration-200 flex-shrink-0"
                                     :class="{ 'rotate-180': isCategoryDropdownOpen }"
                                 />
                             </button>
 
                             <div
                                 v-if="isCategoryDropdownOpen"
-                                class="absolute left-0 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-20 max-h-80 overflow-y-auto backdrop-blur-sm"
+                                class="absolute left-0 mt-2 w-56 sm:w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-20 max-h-80 overflow-y-auto backdrop-blur-sm"
                                 data-testid="category-dropdown"
                             >
                                 <!-- All Categories Button -->
@@ -181,16 +181,16 @@
 
                         <!-- Search Input -->
                         <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <MagnifyingGlassIcon class="h-5 w-5 text-gray-400" />
+                            <div class="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+                                <MagnifyingGlassIcon class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
                             </div>
                             <input
                                 type="text"
                                 v-model="searchQuery"
                                 @input="updateSearch"
-                                placeholder="Search by title, english title, file name, or submitter..."
+                                placeholder="Search anime..."
                                 title="Advanced Search: Search across title, title_english, release_file_name, and submitter_name"
-                                class="block w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md leading-5 bg-white dark:bg-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm text-gray-900 dark:text-white"
+                                class="block w-full pl-8 sm:pl-10 pr-2 sm:pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md leading-5 bg-white dark:bg-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-xs sm:text-sm text-gray-900 dark:text-white min-w-[150px] sm:min-w-[200px]"
                                 data-testid="search-input"
                             />
                         </div>
@@ -199,28 +199,28 @@
                     <!-- Theme Toggle -->
                     <button
                         @click="toggleTheme"
-                        class="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors"
-                        aria-label="Toggle dark mode"
+                        class="p-1.5 sm:p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                        aria-label="Toggle theme"
                         data-testid="theme-toggle"
                     >
-                        <SunIcon v-if="isDarkMode" class="h-5 w-5" />
-                        <MoonIcon v-else class="h-5 w-5" />
+                        <SunIcon v-if="isDarkMode" class="h-4 w-4 sm:h-5 sm:w-5" />
+                        <MoonIcon v-else class="h-4 w-4 sm:h-5 sm:w-5" />
                     </button>
 
                     <!-- User Menu (Desktop) -->
-                    <div class="hidden sm:block relative" ref="userMenuDropdown">
+                    <div class="hidden md:block relative" ref="userMenuDropdown">
                         <button
                             v-if="authStore?.isAuthenticated"
                             @click="showUserMenu = !showUserMenu"
-                            class="flex items-center space-x-2 p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors"
+                            class="flex items-center space-x-2 p-1.5 sm:p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors"
                             data-testid="user-menu-button"
                         >
-                            <UserCircleIcon class="h-6 w-6" />
+                            <UserCircleIcon class="h-5 w-5 sm:h-6 sm:w-6" />
                         </button>
                         <NuxtLink
                             v-else
                             to="/login"
-                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors mr-2"
+                            class="inline-flex items-center px-2 sm:px-3 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors mr-1 sm:mr-2"
                             data-testid="login-button"
                         >
                             Login
@@ -228,7 +228,7 @@
                         <NuxtLink
                             v-if="!authStore?.isAuthenticated"
                             to="/register"
-                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-gray-800 dark:text-white bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                            class="inline-flex items-center px-2 sm:px-3 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-lg shadow-sm text-gray-800 dark:text-white bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
                             data-testid="register-button"
                         >
                             Register
@@ -237,38 +237,38 @@
                         <!-- User Dropdown Menu -->
                         <div
                             v-if="showUserMenu && authStore?.isAuthenticated"
-                            class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-20"
+                            class="absolute right-0 mt-2 w-56 sm:w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20"
                             data-testid="user-menu"
                         >
-                            <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                                <p class="text-sm text-gray-700 dark:text-gray-300">Signed in as</p>
-                                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                            <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 rounded-t-lg border-b border-gray-200 dark:border-gray-700">
+                                <div class="text-xs text-gray-500 dark:text-gray-400">Signed in as</div>
+                                <div class="font-medium text-gray-900 dark:text-white text-sm truncate">
                                     {{ authStore.user?.email }}
-                                </p>
-                                <p class="text-xs mt-1 text-gray-500 dark:text-gray-400">
+                                </div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                     Role:
-                                    <span class="font-medium capitalize">{{
+                                    <span class="font-medium capitalize text-blue-600 dark:text-blue-400">{{
                                         isAdminUser ? "admin" : (authStore.user?.role ?? "user")
                                     }}</span>
-                                </p>
+                                </div>
                             </div>
                             <div class="py-1">
                                 <NuxtLink
                                     v-if="isAdminUser"
                                     to="/admin"
                                     @click="showUserMenu = false"
-                                    class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                    class="flex items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                                     data-testid="admin-link"
                                 >
-                                    <ShieldCheckIcon class="mr-3 h-5 w-5 text-gray-400" />
+                                    <ShieldCheckIcon class="mr-3 h-4 w-4 text-gray-400" />
                                     Admin Panel
                                 </NuxtLink>
                                 <button
                                     @click="handleLogout"
-                                    class="flex w-full items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                    class="flex w-full items-center px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                                     data-testid="logout-button"
                                 >
-                                    <ArrowRightOnRectangleIcon class="mr-3 h-5 w-5 text-gray-400" />
+                                    <ArrowRightOnRectangleIcon class="mr-3 h-4 w-4" />
                                     Sign out
                                 </button>
                             </div>
@@ -278,22 +278,22 @@
                     <!-- Mobile menu button -->
                     <button
                         @click="showMobileMenu = !showMobileMenu"
-                        class="md:hidden p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors"
+                        class="lg:hidden p-1.5 sm:p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors"
                         aria-label="Open menu"
                         data-testid="mobile-menu-button"
                     >
-                        <Bars3Icon v-if="!showMobileMenu" class="h-6 w-6" />
-                        <XMarkIcon v-else class="h-6 w-6" />
+                        <Bars3Icon v-if="!showMobileMenu" class="h-5 w-5 sm:h-6 sm:w-6" />
+                        <XMarkIcon v-else class="h-5 w-5 sm:h-6 sm:w-6" />
                     </button>
                 </div>
             </div>
 
             <!-- Mobile Menu -->
-            <div v-if="showMobileMenu" class="md:hidden py-3 border-t border-gray-200 dark:border-gray-700">
-                <div class="space-y-1 px-2">
+            <div v-if="showMobileMenu" class="lg:hidden py-3 border-t border-gray-200 dark:border-gray-700">
+                <div class="space-y-1 px-3 sm:px-4">
                     <NuxtLink
                         to="/"
-                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        class="block px-3 py-2.5 rounded-md text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                         active-class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
                         @click="showMobileMenu = false"
                     >
@@ -301,7 +301,7 @@
                     </NuxtLink>
                     <NuxtLink
                         to="/browse"
-                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        class="block px-3 py-2.5 rounded-md text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                         active-class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
                         @click="showMobileMenu = false"
                     >
@@ -309,7 +309,7 @@
                     </NuxtLink>
                     <NuxtLink
                         to="/top-rated"
-                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        class="block px-3 py-2.5 rounded-md text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                         active-class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
                         @click="showMobileMenu = false"
                     >
@@ -317,35 +317,44 @@
                     </NuxtLink>
                     <NuxtLink
                         to="/latest"
-                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        class="block px-3 py-2.5 rounded-md text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                         active-class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
                         @click="showMobileMenu = false"
                     >
                         Latest
+                    </NuxtLink>
+                    <NuxtLink
+                        v-if="authStore?.isAuthenticated"
+                        to="/posts"
+                        class="block px-3 py-2.5 rounded-md text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        active-class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
+                        @click="showMobileMenu = false"
+                    >
+                        My Posts
                     </NuxtLink>
                 </div>
 
                 <!-- Mobile Search -->
                 <div
                     v-if="!props.hideSearchAndFilter"
-                    class="px-2 pt-4 pb-3 border-t border-gray-200 dark:border-gray-700"
+                    class="px-3 sm:px-4 pt-4 pb-3 border-t border-gray-200 dark:border-gray-700"
                 >
                     <!-- Mobile Category Dropdown -->
                     <div class="relative mb-3" ref="mobileCategoryDropdown">
                         <button
                             @click="toggleCategoryDropdown"
-                            class="flex items-center justify-between w-full gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors"
+                            class="flex items-center justify-between w-full gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors shadow-sm"
                         >
-                            <span class="truncate">{{ displaySelectedCategory }}</span>
+                            <span class="truncate font-medium">{{ displaySelectedCategory }}</span>
                             <ChevronDownIcon
-                                class="w-4 h-4 text-gray-400 transition-transform"
+                                class="w-4 h-4 text-gray-400 transition-transform flex-shrink-0"
                                 :class="{ 'rotate-180': isCategoryDropdownOpen }"
                             />
                         </button>
 
                         <div
                             v-if="isCategoryDropdownOpen"
-                            class="absolute left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-20 max-h-72 overflow-y-auto"
+                            class="absolute left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20 max-h-64 overflow-y-auto"
                         >
                             <!-- All Categories Button -->
                             <button
@@ -406,8 +415,8 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center space-x-2 mb-3">
-                        <div class="relative w-full">
+                    <div class="mb-4">
+                        <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <MagnifyingGlassIcon class="h-5 w-5 text-gray-400" />
                             </div>
@@ -415,21 +424,21 @@
                                 type="text"
                                 v-model="searchQuery"
                                 @input="updateSearch"
-                                placeholder="Search by title, english title, file name, or submitter..."
+                                placeholder="Search anime..."
                                 title="Advanced Search: Search across title, title_english, release_file_name, and submitter_name"
-                                class="block w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md leading-5 bg-white dark:bg-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm text-gray-900 dark:text-white"
+                                class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg leading-5 bg-white dark:bg-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-sm text-gray-900 dark:text-white shadow-sm"
                             />
                         </div>
                     </div>
 
                     <!-- Mobile User Actions -->
-                    <div v-if="authStore?.isAuthenticated" class="space-y-1">
-                        <div class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                            Signed in as
-                            <span class="font-medium text-gray-900 dark:text-white">{{ authStore.user?.email }}</span>
-                            <div class="text-xs mt-1">
+                    <div v-if="authStore?.isAuthenticated" class="space-y-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                        <div class="px-3 py-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                            <div class="text-xs text-gray-500 dark:text-gray-400">Signed in as</div>
+                            <div class="font-medium text-gray-900 dark:text-white text-sm truncate">{{ authStore.user?.email }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                 Role:
-                                <span class="font-medium capitalize">{{
+                                <span class="font-medium capitalize text-blue-600 dark:text-blue-400">{{  
                                     isAdminUser ? "admin" : (authStore.user?.role ?? "user")
                                 }}</span>
                             </div>
@@ -438,29 +447,30 @@
                             v-if="isAdminUser"
                             to="/admin"
                             @click="showMobileMenu = false"
-                            class="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                            class="flex items-center px-3 py-2.5 rounded-lg text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                         >
-                            <ShieldCheckIcon class="mr-3 h-5 w-5 text-gray-400" />
+                            <ShieldCheckIcon class="mr-3 h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
                             Admin Panel
                         </NuxtLink>
                         <button
                             @click="handleLogout"
-                            class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                            class="flex items-center w-full text-left px-3 py-2.5 rounded-lg text-sm sm:text-base font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                         >
+                            <ArrowRightOnRectangleIcon class="mr-3 h-4 w-4 sm:h-5 sm:w-5" />
                             Sign out
                         </button>
                     </div>
-                    <div v-else class="flex space-x-2">
+                    <div v-else class="flex flex-col sm:flex-row gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
                         <NuxtLink
                             to="/login"
-                            class="block w-full text-center px-3 py-2 rounded-md text-base font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                            class="flex-1 text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm"
                             @click="showMobileMenu = false"
                         >
                             Login
                         </NuxtLink>
                         <NuxtLink
                             to="/register"
-                            class="block w-full text-center px-3 py-2 rounded-md text-base font-medium bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                            class="flex-1 text-center px-4 py-2.5 rounded-lg text-sm font-medium bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors shadow-sm"
                             @click="showMobileMenu = false"
                         >
                             Register
