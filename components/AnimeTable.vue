@@ -423,11 +423,25 @@ const formatReleaseFileName = (fileName: string) => {
 
     let formatted = fileName
         .replace(/\.(mkv|mp4|avi|mov|wmv|flv|webm)$/i, "") // Hapus ekstensi video
-        .replace(/\[.*?\]/g, "") // Hapus teks dalam kurung siku
-        .replace(/\(.*?\)/g, "") // Hapus teks dalam kurung biasa
         .replace(/_/g, " ") // Ganti underscore dengan spasi
         .replace(/\s+/g, " ") // Ganti multiple spasi dengan single spasi
         .trim();
+
+    // Jika nama file terlalu panjang (lebih dari 60 karakter), potong dengan elegan
+    if (formatted.length > 60) {
+        // Coba ambil bagian utama tanpa menghilangkan info penting
+        const match = formatted.match(/^(\[.*?\])?\s*([^\(\[]+)/);
+        if (match) {
+            const group = match[1] || "";
+            const title = match[2].trim();
+            formatted = `${group} ${title}`.trim();
+        }
+        
+        // Jika masih terlalu panjang, potong dengan "..."
+        if (formatted.length > 60) {
+            formatted = formatted.substring(0, 57) + "...";
+        }
+    }
 
     return formatted || fileName;
 };
