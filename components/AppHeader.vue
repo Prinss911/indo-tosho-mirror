@@ -1,22 +1,22 @@
 <template>
     <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-600 sticky top-0 z-50">
         <div class="container-extra-wide">
-            <div class="flex items-center justify-between h-14 sm:h-16 px-2 sm:px-4">
+            <div class="flex items-center justify-between h-12 xs:h-14 sm:h-16 px-1 xs:px-2 sm:px-4">
                 <!-- Logo and Navigation -->
-                <div class="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
-                    <NuxtLink to="/" class="flex items-center space-x-1 sm:space-x-2">
+                <div class="flex items-center space-x-1 xs:space-x-2 sm:space-x-4 flex-shrink-0 min-w-0">
+                    <NuxtLink to="/" class="flex items-center space-x-1 xs:space-x-1.5 sm:space-x-2 min-w-0">
                         <div
-                            class="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md"
+                            class="w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md flex-shrink-0"
                         >
                             <span class="text-white font-bold text-xs sm:text-sm">AD</span>
                         </div>
-                        <span class="text-base sm:text-lg font-bold text-gray-900 dark:text-white hidden sm:block"
+                        <span class="text-sm xs:text-base sm:text-lg font-bold text-gray-900 dark:text-white hidden xs:block truncate"
                             >Anime Database</span
                         >
                     </NuxtLink>
 
                     <!-- Desktop Navigation -->
-                    <nav class="hidden lg:flex space-x-3 xl:space-x-4">
+                    <nav class="hidden lg:flex space-x-2 xl:space-x-3 2xl:space-x-4">
                         <NuxtLink
                             to="/"
                             class="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium transition-colors"
@@ -57,31 +57,31 @@
                 </div>
 
                 <!-- Search and Actions -->
-                <div class="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
+                <div class="flex items-center space-x-0.5 xs:space-x-1 sm:space-x-2 flex-shrink min-w-0">
                     <!-- Search Bar -->
-                    <div v-if="!props.hideSearchAndFilter" class="hidden md:flex items-center space-x-2">
+                    <div v-if="!props.hideSearchAndFilter" class="hidden sm:flex items-center space-x-1 lg:space-x-2 min-w-0">
                         <!-- Category Dropdown -->
-                        <div class="relative" ref="categoryDropdown">
+                        <div class="relative flex-shrink-0" ref="categoryDropdown">
                             <button
                                 @click="toggleCategoryDropdown"
-                                class="flex items-center gap-1 sm:gap-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600 border border-blue-200 dark:border-gray-600 rounded-lg px-2 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-300 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-gray-600 dark:hover:to-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 min-w-[100px] sm:min-w-[140px] shadow-sm hover:shadow-md"
+                                class="flex items-center gap-1 lg:gap-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600 border border-blue-200 dark:border-gray-600 rounded-lg px-2 lg:px-3 py-1.5 lg:py-2 text-xs lg:text-sm font-medium text-blue-700 dark:text-blue-300 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-gray-600 dark:hover:to-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 min-w-[80px] lg:min-w-[120px] max-w-[120px] lg:max-w-[160px] shadow-sm hover:shadow-md"
                                 data-testid="category-select"
                             >
-                                <div class="flex items-center gap-1 sm:gap-2 flex-1">
-                                    <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-500 dark:bg-blue-400 rounded-full flex-shrink-0"></div>
-                                    <span data-testid="selected-category" class="truncate font-medium">{{
+                                <div class="flex items-center gap-1 lg:gap-1.5 flex-1 min-w-0">
+                                    <div class="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-blue-500 dark:bg-blue-400 rounded-full flex-shrink-0"></div>
+                                    <span data-testid="selected-category" class="truncate font-medium text-xs lg:text-sm">{{
                                         displaySelectedCategory
                                     }}</span>
                                 </div>
                                 <ChevronDownIcon
-                                    class="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 dark:text-blue-400 transition-transform duration-200 flex-shrink-0"
+                                    class="w-3 h-3 lg:w-4 lg:h-4 text-blue-500 dark:text-blue-400 transition-transform duration-200 flex-shrink-0"
                                     :class="{ 'rotate-180': isCategoryDropdownOpen }"
                                 />
                             </button>
 
                             <div
                                 v-if="isCategoryDropdownOpen"
-                                class="absolute left-0 mt-2 w-56 sm:w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-20 max-h-80 overflow-y-auto backdrop-blur-sm"
+                                class="absolute left-0 mt-2 w-48 sm:w-56 lg:w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-20 max-h-80 overflow-y-auto backdrop-blur-sm"
                                 data-testid="category-dropdown"
                             >
                                 <!-- All Categories Button -->
@@ -180,9 +180,9 @@
                         </div>
 
                         <!-- Search Input -->
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
-                                <MagnifyingGlassIcon class="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+                        <div class="relative flex-1 min-w-0">
+                            <div class="absolute inset-y-0 left-0 pl-2 lg:pl-3 flex items-center pointer-events-none">
+                                <MagnifyingGlassIcon class="h-4 w-4 lg:h-5 lg:w-5 text-gray-400" />
                             </div>
                             <input
                                 type="text"
@@ -190,7 +190,7 @@
                                 @input="updateSearch"
                                 placeholder="Search anime..."
                                 title="Advanced Search: Search across title, title_english, release_file_name, and submitter_name"
-                                class="block w-full pl-8 sm:pl-10 pr-2 sm:pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md leading-5 bg-white dark:bg-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-xs sm:text-sm text-gray-900 dark:text-white min-w-[150px] sm:min-w-[200px]"
+                                class="block w-full pl-7 lg:pl-10 pr-2 lg:pr-3 py-1.5 lg:py-2 border border-gray-200 dark:border-gray-700 rounded-md leading-5 bg-white dark:bg-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-xs lg:text-sm text-gray-900 dark:text-white min-w-[120px] lg:min-w-[180px] max-w-[200px] lg:max-w-[250px]"
                                 data-testid="search-input"
                             />
                         </div>
@@ -199,28 +199,28 @@
                     <!-- Theme Toggle -->
                     <button
                         @click="toggleTheme"
-                        class="p-1.5 sm:p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                        class="p-1 xs:p-1.5 sm:p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 flex-shrink-0"
                         aria-label="Toggle theme"
                         data-testid="theme-toggle"
                     >
-                        <SunIcon v-if="isDarkMode" class="h-4 w-4 sm:h-5 sm:w-5" />
-                        <MoonIcon v-else class="h-4 w-4 sm:h-5 sm:w-5" />
+                        <SunIcon v-if="isDarkMode" class="h-4 w-4 xs:h-4 xs:w-4 sm:h-5 sm:w-5" />
+                        <MoonIcon v-else class="h-4 w-4 xs:h-4 xs:w-4 sm:h-5 sm:w-5" />
                     </button>
 
                     <!-- User Menu (Desktop) -->
-                    <div class="hidden md:block relative" ref="userMenuDropdown">
+                    <div class="hidden sm:block relative flex-shrink-0" ref="userMenuDropdown">
                         <button
                             v-if="authStore?.isAuthenticated"
                             @click="showUserMenu = !showUserMenu"
-                            class="flex items-center space-x-2 p-1.5 sm:p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors"
+                            class="flex items-center space-x-2 p-1 sm:p-1.5 lg:p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors"
                             data-testid="user-menu-button"
                         >
-                            <UserCircleIcon class="h-5 w-5 sm:h-6 sm:w-6" />
+                            <UserCircleIcon class="h-5 w-5 lg:h-6 lg:w-6" />
                         </button>
                         <NuxtLink
                             v-else
                             to="/login"
-                            class="inline-flex items-center px-2 sm:px-3 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors mr-1 sm:mr-2"
+                            class="inline-flex items-center px-2 lg:px-3 py-1.5 lg:py-2 border border-transparent text-xs lg:text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors mr-1 lg:mr-2"
                             data-testid="login-button"
                         >
                             Login
@@ -228,7 +228,7 @@
                         <NuxtLink
                             v-if="!authStore?.isAuthenticated"
                             to="/register"
-                            class="inline-flex items-center px-2 sm:px-3 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-lg shadow-sm text-gray-800 dark:text-white bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                            class="inline-flex items-center px-2 lg:px-3 py-1.5 lg:py-2 border border-transparent text-xs lg:text-sm font-medium rounded-lg shadow-sm text-gray-800 dark:text-white bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
                             data-testid="register-button"
                         >
                             Register
@@ -278,22 +278,22 @@
                     <!-- Mobile menu button -->
                     <button
                         @click="showMobileMenu = !showMobileMenu"
-                        class="lg:hidden p-1.5 sm:p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors"
+                        class="sm:hidden p-1.5 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors flex-shrink-0"
                         aria-label="Open menu"
                         data-testid="mobile-menu-button"
                     >
-                        <Bars3Icon v-if="!showMobileMenu" class="h-5 w-5 sm:h-6 sm:w-6" />
-                        <XMarkIcon v-else class="h-5 w-5 sm:h-6 sm:w-6" />
+                        <Bars3Icon v-if="!showMobileMenu" class="h-5 w-5" />
+                        <XMarkIcon v-else class="h-5 w-5" />
                     </button>
                 </div>
             </div>
 
             <!-- Mobile Menu -->
-            <div v-if="showMobileMenu" class="lg:hidden py-3 border-t border-gray-200 dark:border-gray-700">
-                <div class="space-y-1 px-3 sm:px-4">
+            <div v-if="showMobileMenu" class="sm:hidden py-2 border-t border-gray-200 dark:border-gray-700">
+                <div class="space-y-1 px-2">
                     <NuxtLink
                         to="/"
-                        class="block px-3 py-2.5 rounded-md text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        class="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                         active-class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
                         @click="showMobileMenu = false"
                     >
@@ -301,7 +301,7 @@
                     </NuxtLink>
                     <NuxtLink
                         to="/browse"
-                        class="block px-3 py-2.5 rounded-md text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        class="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                         active-class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
                         @click="showMobileMenu = false"
                     >
@@ -309,7 +309,7 @@
                     </NuxtLink>
                     <NuxtLink
                         to="/top-rated"
-                        class="block px-3 py-2.5 rounded-md text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        class="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                         active-class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
                         @click="showMobileMenu = false"
                     >
@@ -317,7 +317,7 @@
                     </NuxtLink>
                     <NuxtLink
                         to="/latest"
-                        class="block px-3 py-2.5 rounded-md text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        class="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                         active-class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
                         @click="showMobileMenu = false"
                     >
@@ -326,7 +326,7 @@
                     <NuxtLink
                         v-if="authStore?.isAuthenticated"
                         to="/posts"
-                        class="block px-3 py-2.5 rounded-md text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        class="block px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                         active-class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
                         @click="showMobileMenu = false"
                     >
@@ -337,15 +337,15 @@
                 <!-- Mobile Search -->
                 <div
                     v-if="!props.hideSearchAndFilter"
-                    class="px-3 sm:px-4 pt-4 pb-3 border-t border-gray-200 dark:border-gray-700"
+                    class="px-2 pt-3 pb-2 border-t border-gray-200 dark:border-gray-700"
                 >
                     <!-- Mobile Category Dropdown -->
-                    <div class="relative mb-3" ref="mobileCategoryDropdown">
+                    <div class="relative mb-2" ref="mobileCategoryDropdown">
                         <button
                             @click="toggleCategoryDropdown"
-                            class="flex items-center justify-between w-full gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors shadow-sm"
+                            class="flex items-center justify-between w-full gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors shadow-sm"
                         >
-                            <span class="truncate font-medium">{{ displaySelectedCategory }}</span>
+                            <span class="truncate font-medium text-xs">{{ displaySelectedCategory }}</span>
                             <ChevronDownIcon
                                 class="w-4 h-4 text-gray-400 transition-transform flex-shrink-0"
                                 :class="{ 'rotate-180': isCategoryDropdownOpen }"
@@ -354,7 +354,7 @@
 
                         <div
                             v-if="isCategoryDropdownOpen"
-                            class="absolute left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20 max-h-64 overflow-y-auto"
+                            class="absolute left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-20 max-h-48 overflow-y-auto"
                         >
                             <!-- All Categories Button -->
                             <button
@@ -415,10 +415,10 @@
                         </div>
                     </div>
 
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <MagnifyingGlassIcon class="h-5 w-5 text-gray-400" />
+                                <MagnifyingGlassIcon class="h-4 w-4 text-gray-400" />
                             </div>
                             <input
                                 type="text"
@@ -426,7 +426,7 @@
                                 @input="updateSearch"
                                 placeholder="Search anime..."
                                 title="Advanced Search: Search across title, title_english, release_file_name, and submitter_name"
-                                class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg leading-5 bg-white dark:bg-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-sm text-gray-900 dark:text-white shadow-sm"
+                                class="block w-full pl-9 pr-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg leading-5 bg-white dark:bg-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-sm text-gray-900 dark:text-white shadow-sm"
                             />
                         </div>
                     </div>
