@@ -19,7 +19,6 @@
                             >
                                 <option value="date" class="bg-white dark:bg-gray-800">📅 Date</option>
                                 <option value="title" class="bg-white dark:bg-gray-800">📝 Title</option>
-                                <option value="rating" class="bg-white dark:bg-gray-800">⭐ Rating</option>
                                 <option value="downloads" class="bg-white dark:bg-gray-800">📥 Downloads</option>
                             </select>
                             <!-- Sembunyikan ikon saat dropdown terbuka -->
@@ -156,10 +155,6 @@
                             </td>
                             <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                                 <div class="space-y-1">
-                                    <div class="flex items-center" data-testid="anime-rating">
-                                        <StarIcon class="w-3 h-3 text-yellow-400 mr-1" />
-                                        <span>{{ anime.rating }}/10</span>
-                                    </div>
                                     <div class="text-xs text-gray-500 dark:text-gray-400">{{ anime.episodes }} eps</div>
                                 </div>
                             </td>
@@ -240,10 +235,7 @@
                             <div
                                 class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400"
                             >
-                                <div class="flex items-center">
-                                    <StarIcon class="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 mr-1" />
-                                    <span>{{ anime.rating ?? "N/A" }}/10</span>
-                                </div>
+
                                 <span>{{ anime.episodes ?? "N/A" }} eps</span>
 
                                 <div>
@@ -290,7 +282,6 @@ import { useRouter } from "vue-router";
 import {
     ChevronUpIcon,
     ChevronDownIcon,
-    StarIcon,
     EyeIcon,
     ArrowDownIcon,
     ExclamationTriangleIcon,
