@@ -74,7 +74,7 @@
 
                             <div
                                 v-if="isCategoryDropdownOpen"
-                                class="absolute left-0 mt-2 w-48 sm:w-56 lg:w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 max-h-80 overflow-y-auto backdrop-blur-sm"
+                                class="absolute left-0 mt-2 w-48 sm:w-56 lg:w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-[9999] max-h-80 overflow-y-auto backdrop-blur-sm"
                                 data-testid="category-dropdown"
                             >
                                 <!-- All Categories Button -->
@@ -230,7 +230,7 @@
                         <!-- User Dropdown Menu -->
                         <div
                             v-if="showUserMenu && authStore?.isAuthenticated"
-                            class="absolute right-0 mt-2 w-56 sm:w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
+                            class="absolute right-0 mt-2 w-56 sm:w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-[9999]"
                             data-testid="user-menu"
                         >
                             <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 rounded-t-lg border-b border-gray-200 dark:border-gray-700">

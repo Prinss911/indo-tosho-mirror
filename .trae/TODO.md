@@ -1,8 +1,6 @@
 # TODO:
 
-- [x] 43: Hapus semua referensi 'Latest' dari desktop navigation di AppHeader.vue (priority: High)
-- [x] 44: Hapus semua referensi 'Latest' dari mobile menu di AppHeader.vue (priority: High)
-- [x] 45: Perbaiki visibility navigation buttons untuk mobile (ubah hidden lg:flex menjadi hidden md:flex) (priority: High)
-- [x] 46: Pastikan navigation buttons Home, Browse, Top Rated terlihat di tablet dan mobile (priority: Medium)
-- [x] 47: Test navigation di berbagai ukuran layar setelah perubahan (priority: Medium)
-- [ ] 48: Commit dan push perubahan penghapusan Latest dan perbaikan mobile navigation (**IN PROGRESS**) (priority: Low)
+- [x] 61: Tingkatkan z-index user dropdown menu dari z-50 menjadi z-[9999] untuk mengatasi masalah layering (priority: High)
+- [x] 62: Periksa dan tingkatkan z-index category dropdown juga jika diperlukan (priority: Medium)
+- [x] 63: Test dropdown menu untuk memastikan muncul di atas anime table (priority: Medium)
+- [ ] 64: Commit dan push perbaikan z-index yang lebih tinggi (**IN PROGRESS**) (priority: Low)
