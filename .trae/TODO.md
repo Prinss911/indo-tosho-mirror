@@ -1,6 +1,7 @@
 # TODO:
 
-- [x] 65: Periksa dan perbaiki Vue warning 'Component that was made a reactive object' di tests/unit/pages/admin/index.unit.test.ts (priority: High)
-- [x] 66: Periksa dan perbaiki Vue warning 'Component that was made a reactive object' di tests/unit/pages/admin/posts.unit.test.ts (priority: High)
-- [x] 67: Perbaiki router injection warning di tests/unit/pages/admin/posts.unit.test.ts (priority: Medium)
-- [x] 68: Jalankan test ulang untuk memastikan semua warning telah diperbaiki (priority: Medium)
+- [x] 69: Hapus semua kode warna badge yang ada di fungsi getCategoryColor pada AnimeTable.vue (priority: High)
+- [x] 70: Akses Supabase untuk melihat struktur dan data tabel categories (priority: High)
+- [x] 72: Buat sistem warna badge baru berdasarkan kategori utama (parent_id null) dan subkategori (priority: High)
+- [x] 71: Analisis hierarki kategori berdasarkan parent_id dan name dari tabel categories (priority: Medium)
+- [ ] 73: Test dan verifikasi sistem warna badge yang baru berfungsi dengan baik (**IN PROGRESS**) (priority: Medium)
