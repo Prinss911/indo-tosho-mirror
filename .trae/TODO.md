@@ -1,9 +1,10 @@
 # TODO:
 
-- [x] 16: Fix API endpoint error handling tests - make them properly throw errors instead of resolving (priority: High)
-- [x] 18: Fix security event logging test to properly call logSecurityEvent (priority: High)
-- [x] 17: Add missing updateCriteria and updateCategory functions to top-rated.vue (priority: High)
-- [x] 22: Modify anime detail page layout for mobile responsiveness - move cover image and description below main content on mobile/tablet (priority: High)
-- [ ] 19: Fix unhandled rejections and errors in test suite (priority: Medium)
-- [ ] 20: Update API endpoint to properly handle invalid HTTP methods and error scenarios (priority: Medium)
-- [ ] 21: Run tests again to verify all fixes work correctly (priority: Low)
+- [x] 1: Analisis struktur halaman top-rated.vue dan composable useTopRated (priority: High)
+- [x] 2: Buat unit test untuk rendering komponen dasar top-rated.vue (priority: High)
+- [x] 3: Buat unit test untuk composable useTopRated dengan mock API calls dan data (priority: High)
+- [x] 4: Jalankan test untuk memastikan semua unit test berfungsi dengan baik (priority: Medium)
+- [x] 5: Buat unit test untuk fungsionalitas filter dan sorting (priority: Medium)
+- [x] 6: Buat unit test untuk status loading dan penanganan error (priority: Medium)
+- [x] 7: Buat unit test untuk interaksi pengguna (perubahan kriteria, kategori, tahun) (priority: Medium)
+- [x] 8: Buat unit test untuk fungsionalitas modal post terkait (priority: Low)
