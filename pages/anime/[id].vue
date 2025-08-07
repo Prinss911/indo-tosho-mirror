@@ -362,13 +362,26 @@
                                     >
                                 </div>
 
-                                <!-- Add Comment Form -->
-                                <div class="mb-8 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                <!-- Login Required Message -->
+                                <div v-if="!authStore.isAuthenticated" class="mb-8 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4 bg-yellow-50 dark:bg-yellow-900/20">
+                                    <div class="flex items-center space-x-3">
+                                        <ExclamationTriangleIcon class="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+                                        <div>
+                                            <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Login Required</h3>
+                                            <p class="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                                                You need to <NuxtLink to="/login" class="underline hover:text-yellow-900 dark:hover:text-yellow-100">login</NuxtLink> to add comments.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Add Comment Form (Only for authenticated users) -->
+                                <div v-if="authStore.isAuthenticated" class="mb-8 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                                     <div class="flex items-start space-x-3">
                                         <div
                                             class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium"
                                         >
-                                            U
+                                            {{ authStore.currentUser?.username?.charAt(0).toUpperCase() || 'U' }}
                                         </div>
                                         <div class="flex-1">
                                             <div class="mb-3">
@@ -376,7 +389,8 @@
                                                     v-model="newComment.author"
                                                     type="text"
                                                     placeholder="Your name"
-                                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                    readonly
+                                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 cursor-not-allowed"
                                                 />
                                             </div>
                                             <div class="mb-3">
@@ -671,6 +685,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useAnimeStore } from "~/stores/anime";
+import { useAuthStore } from "~/stores/auth";
 import { sanitizeTextarea, sanitizeInput } from "~/utils/input-sanitizer";
 import {
     StarIcon,
@@ -689,6 +704,7 @@ import { nextTick } from "vue";
 
 const route = useRoute();
 const animeStore = useAnimeStore();
+const authStore = useAuthStore();
 
 // Reactive state
 const loading = ref(true);
@@ -1017,14 +1033,22 @@ const formatCommentDate = (dateString: string) => {
 };
 
 const addComment = () => {
-    if (!newComment.value.author.trim() || !newComment.value.content.trim()) {
+    // Check if user is authenticated
+    if (!authStore.isAuthenticated) {
         return;
     }
+
+    if (!newComment.value.content.trim()) {
+        return;
+    }
+
+    // Use authenticated user's username
+    const username = authStore.currentUser?.username || 'Anonymous';
 
     // Sanitize comment data before adding
     const comment = {
         id: Date.now().toString(),
-        author: sanitizeInput(newComment.value.author.trim()),
+        author: sanitizeInput(username),
         content: sanitizeTextarea(newComment.value.content.trim()),
         date: new Date().toISOString(),
         likes: 0
@@ -1044,7 +1068,12 @@ const addComment = () => {
 };
 
 const clearComment = () => {
-    newComment.value.author = "";
+    // Keep the username for authenticated users
+    if (authStore.isAuthenticated) {
+        newComment.value.author = authStore.currentUser?.username || "";
+    } else {
+        newComment.value.author = "";
+    }
     newComment.value.content = "";
     showPreview.value = false;
 };
@@ -1293,6 +1322,11 @@ onMounted(async () => {
         await animeStore.fetchAnimes();
         // Try to fetch anime data again
         await fetchAnimeData();
+    }
+
+    // Initialize comment author with username if authenticated
+    if (authStore.isAuthenticated && authStore.currentUser?.username) {
+        newComment.value.author = authStore.currentUser.username;
     }
 
     // Load comments for this anime

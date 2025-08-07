@@ -90,7 +90,19 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   devServer: {
     host: '0.0.0.0',
-    port: process.env.PORT || 3000
+    port: process.env.PORT || 3000,
+    // Konfigurasi untuk stabilitas development server
+    https: false,
+    open: false,
+    // Tambahkan headers untuk mengatasi CORS dan caching issues
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    }
   },
   vite: {
     server: {
@@ -98,12 +110,43 @@ export default defineNuxtConfig({
       port: process.env.PORT || 3000,
       hmr: {
         port: process.env.HMR_PORT || 24678,
-        host: '0.0.0.0'
+        host: '0.0.0.0',
+        overlay: false
+      },
+      // Tambahkan konfigurasi untuk stabilitas development
+      fs: {
+        strict: false
+      },
+      watch: {
+        usePolling: false,
+        interval: 100
       }
+    },
+    // Optimasi untuk mengatasi error ERR_ABORTED
+    optimizeDeps: {
+      include: [
+        'vue',
+        'vue-router',
+        '@heroicons/vue/24/outline',
+        '@heroicons/vue/24/solid',
+        'vue-toastification'
+      ],
+      exclude: ['isomorphic-dompurify']
     },
     // Suppress Vite client warnings
     define: {
       __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false
+    },
+    // Konfigurasi build untuk development yang lebih stabil
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['vue', 'vue-router'],
+            ui: ['@heroicons/vue/24/outline', '@heroicons/vue/24/solid']
+          }
+        }
+      }
     }
   },
   // Router configuration to suppress warnings

@@ -335,18 +335,4 @@ export function getSecureCookieOptions() {
     };
 }
 
-/**
- * Log security events
- */
-export function logSecurityEvent(event: H3Event, eventType: string, details: any = {}) {
-    const logData = {
-        timestamp: new Date().toISOString(),
-        type: eventType,
-        ip: getClientIP(event),
-        userAgent: getUserAgent(event),
-        ...details
-    };
-
-    // In production, this should be sent to a proper logging service
-    console.log("[SECURITY]", JSON.stringify(logData));
-}
+// logSecurityEvent function telah dipindahkan ke authorization.ts untuk menghindari duplikasi

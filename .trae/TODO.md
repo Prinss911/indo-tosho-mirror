@@ -1,7 +1,8 @@
 # TODO:
 
-- [x] 69: Hapus semua kode warna badge yang ada di fungsi getCategoryColor pada AnimeTable.vue (priority: High)
-- [x] 70: Akses Supabase untuk melihat struktur dan data tabel categories (priority: High)
-- [x] 72: Buat sistem warna badge baru berdasarkan kategori utama (parent_id null) dan subkategori (priority: High)
-- [x] 71: Analisis hierarki kategori berdasarkan parent_id dan name dari tabel categories (priority: Medium)
-- [ ] 73: Test dan verifikasi sistem warna badge yang baru berfungsi dengan baik (**IN PROGRESS**) (priority: Medium)
+- [x] 90: Analisis error ERR_ABORTED pada loading resource development server (priority: High)
+- [x] 91: Restart development server untuk membersihkan cache dan state (priority: High)
+- [x] 92: Update konfigurasi Vite untuk development yang lebih stabil (priority: Medium)
+- [x] 93: Perbaiki konfigurasi HMR dan hot reload (priority: Medium)
+- [x] 94: Tambahkan fallback untuk resource loading yang gagal (priority: Medium)
+- [x] 95: Verifikasi semua dependencies dan imports berfungsi dengan baik (priority: Low)

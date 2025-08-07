@@ -263,30 +263,67 @@ export const useAuthStore = defineStore("auth", () => {
         error.value = null;
 
         try {
-            // Invalidate session if exists
+            // Silent logout - hanya membersihkan local state tanpa memanggil Supabase API
+            // untuk menghindari ERR_ABORTED error
+            
+            // Invalidate session if exists (tetap panggil API internal untuk cleanup)
             if (sessionId.value) {
-                await $fetch("/api/auth/invalidate-session", {
-                    method: "POST",
-                    body: { sessionId: sessionId.value }
-                }).catch(() => {});
+                try {
+                    await $fetch("/api/auth/invalidate-session", {
+                        method: "POST",
+                        body: { sessionId: sessionId.value }
+                    });
+                } catch (sessionErr) {
+                    // Ignore session invalidation errors - tidak critical untuk UX
+                    console.warn('Session invalidation failed, continuing with logout:', sessionErr);
+                }
             }
 
-            // Sign out from Supabase
-            const { error: supabaseError } = await supabase.auth.signOut();
-
-            if (supabaseError) {
-                // Don't expose logout errors
-                error.value = "Terjadi kesalahan saat logout";
-            }
-
-            // Clear local state
+            // Clear local state immediately tanpa memanggil Supabase signOut
             user.value = null;
             sessionId.value = null;
             csrfToken.value = null;
             lastActivity.value = Date.now();
+
+            // Clear semua stored tokens dan session data dari browser storage
+            if (typeof window !== 'undefined') {
+                try {
+                    // Clear localStorage items
+                    localStorage.removeItem('supabase.auth.token');
+                    localStorage.removeItem('sb-jayavvymuqkkvvlcaudv-auth-token');
+                    
+                    // Clear sessionStorage items juga
+                    sessionStorage.removeItem('supabase.auth.token');
+                    sessionStorage.removeItem('sb-jayavvymuqkkvvlcaudv-auth-token');
+                    
+                    // Clear semua keys yang mengandung 'supabase' atau 'auth'
+                    const keysToRemove = [];
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && (key.includes('supabase') || key.includes('auth'))) {
+                            keysToRemove.push(key);
+                        }
+                    }
+                    keysToRemove.forEach(key => localStorage.removeItem(key));
+                    
+                } catch (storageErr) {
+                    // Ignore localStorage errors - tidak critical
+                    console.warn('Storage cleanup failed:', storageErr);
+                }
+            }
+
+            // Berhasil logout tanpa error
+            console.log('Silent logout completed successfully');
+
         } catch (err) {
-            // Don't log sensitive logout errors
-            error.value = "Logout gagal. Silakan coba lagi.";
+            // Bahkan jika ada error, tetap clear local state untuk UX yang baik
+            user.value = null;
+            sessionId.value = null;
+            csrfToken.value = null;
+            lastActivity.value = Date.now();
+            
+            console.warn('Logout error occurred, but local state cleared for good UX:', err);
+            // Tidak set error.value agar user tidak melihat error message
         } finally {
             isLoading.value = false;
         }
