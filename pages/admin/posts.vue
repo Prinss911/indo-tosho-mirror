@@ -291,18 +291,75 @@
                                 <div class="flex items-center space-x-2">
                                     <button
                                         @click="viewPost(post)"
-                                        class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 action-btn"
+                                        class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 action-btn"
                                         title="Lihat Detail"
                                     >
                                         <DocumentTextIcon class="h-4 w-4" />
                                     </button>
-                                    <button
-                                        @click="editPost(post)"
-                                        class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 action-btn"
-                                        title="Edit Postingan"
-                                    >
-                                        <PencilIcon class="h-4 w-4" />
-                                    </button>
+                                    
+                                    <!-- Edit Dropdown Menu -->
+                                    <Menu as="div" class="relative inline-block text-left">
+                                        <MenuButton
+                                            class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 action-btn"
+                                            title="Edit Options"
+                                        >
+                                            <PencilIcon class="h-4 w-4" />
+                                        </MenuButton>
+                                        <transition
+                                            enter-active-class="transition ease-out duration-100"
+                                            enter-from-class="transform opacity-0 scale-95"
+                                            enter-to-class="transform opacity-100 scale-100"
+                                            leave-active-class="transition ease-in duration-75"
+                                            leave-from-class="transform opacity-100 scale-100"
+                                            leave-to-class="transform opacity-0 scale-95"
+                                        >
+                                            <MenuItems
+                                                class="absolute right-0 origin-top-right divide-y divide-gray-100 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10 mt-2 min-w-[200px]"
+                                            >
+                                                <div class="px-2 py-2">
+                                                    <MenuItem v-slot="{ active }">
+                                                        <button
+                                                            @click="editPost(post)"
+                                                            :class="[
+                                                                active
+                                                                    ? 'bg-green-500 text-white'
+                                                                    : 'text-gray-900 dark:text-gray-100',
+                                                                'group flex w-full items-center rounded-md px-3 py-2.5 text-sm font-medium transition-colors duration-150'
+                                                            ]"
+                                                        >
+                                                            <PencilIcon
+                                                                class="mr-3 h-4 w-4 flex-shrink-0"
+                                                                :class="
+                                                                    active ? 'text-white' : 'text-green-500'
+                                                                "
+                                                            />
+                                                            <span class="whitespace-nowrap">Edit Postingan</span>
+                                                        </button>
+                                                    </MenuItem>
+                                                    <MenuItem v-slot="{ active }">
+                                                        <button
+                                                            @click="showRejectModal(post)"
+                                                            :class="[
+                                                                active
+                                                                    ? 'bg-red-500 text-white'
+                                                                    : 'text-gray-900 dark:text-gray-100',
+                                                                'group flex w-full items-center rounded-md px-3 py-2.5 text-sm font-medium transition-colors duration-150'
+                                                            ]"
+                                                        >
+                                                            <XCircleIcon
+                                                                class="mr-3 h-4 w-4 flex-shrink-0"
+                                                                :class="
+                                                                    active ? 'text-white' : 'text-red-500'
+                                                                "
+                                                            />
+                                                            <span class="whitespace-nowrap">Reject dengan Alasan</span>
+                                                        </button>
+                                                    </MenuItem>
+                                                </div>
+                                            </MenuItems>
+                                        </transition>
+                                    </Menu>
+ 
                                     <Menu as="div" class="relative inline-block text-left" v-if="post.statusApproval === 'pending'">
                                         <MenuButton
                                             class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 action-btn"
@@ -378,7 +435,7 @@
 
                             <!-- Rejection Reason (if rejected) -->
                             <div
-                                v-if="post.statusApproval === 'rejected' && post.rejectionReason"
+                                v-if="post.statusApproval === 'rejected'"
                                 class="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md"
                             >
                                 <div class="flex">
@@ -388,7 +445,7 @@
                                             Alasan Penolakan:
                                         </h5>
                                         <p class="text-sm text-red-700 dark:text-red-300 mt-1">
-                                            {{ post.rejectionReason }}
+                                            {{ post.rejectionReason || 'Tidak ada alasan penolakan yang diberikan.' }}
                                         </p>
                                     </div>
                                 </div>
@@ -537,6 +594,8 @@
                 </div>
             </div>
 
+
+
             <!-- Delete Confirmation Modal -->
             <div v-if="showDeleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
                 <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
@@ -581,15 +640,82 @@
                             <button
                                 type="button"
                                 @click="confirmDelete"
-                                :disabled="!isDeleteConfirmationValid"
+                                :disabled="!isDeleteConfirmationValid || isDeleting"
                                 :class="[
                                     'px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white transition-colors',
-                                    isDeleteConfirmationValid
+                                    isDeleteConfirmationValid && !isDeleting
                                         ? 'bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
                                         : 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
                                 ]"
                             >
-                                Hapus Postingan
+                                <span v-if="isDeleting" class="flex items-center">
+                                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Menghapus...
+                                </span>
+                                <span v-else>Hapus Postingan</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reject Post Modal -->
+            <div v-if="showRejectPostModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+                <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+                    <div class="mt-3">
+                        <div
+                            class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900 mb-4"
+                        >
+                            <XCircleIcon class="h-6 w-6 text-red-600 dark:text-red-400" />
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white text-center mb-4">Tolak Postingan</h3>
+                        <div class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                            <p class="mb-3 text-center">
+                                Anda akan menolak postingan <strong>{{ postToReject?.title }}</strong>
+                            </p>
+                            <div
+                                class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-md p-3 mb-4"
+                            >
+                                <p class="text-orange-800 dark:text-orange-200 text-xs">
+                                    ℹ️ <strong>Info:</strong> Postingan akan ditandai sebagai ditolak dan pengguna akan menerima notifikasi.
+                                </p>
+                            </div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Alasan Penolakan <span class="text-red-500">*</span>
+                            </label>
+                            <textarea
+                                v-model="rejectionReason"
+                                rows="4"
+                                placeholder="Jelaskan alasan mengapa postingan ini ditolak..."
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm resize-none"
+                            ></textarea>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                Minimal 10 karakter ({{ rejectionReason.length }}/10)
+                            </p>
+                        </div>
+                        <div class="flex justify-center space-x-3">
+                            <button
+                                type="button"
+                                @click="cancelReject"
+                                class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                            >
+                                Batal
+                            </button>
+                            <button
+                                type="button"
+                                @click="confirmReject"
+                                :disabled="!isRejectReasonValid"
+                                :class="[
+                                    'px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white transition-colors',
+                                    isRejectReasonValid
+                                        ? 'bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
+                                        : 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
+                                ]"
+                            >
+                                Tolak Postingan
                             </button>
                         </div>
                     </div>
@@ -645,6 +771,7 @@ const selectedStatus = ref("");
 const selectedCategory = ref("");
 const sortBy = ref("newest");
 const showAddPostModal = ref(false);
+
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
 const newPost = ref({
@@ -658,6 +785,7 @@ const newPost = ref({
     releaseFileName: ""
 });
 
+
 // Posts data from API
 const posts = ref([]);
 // Categories data from API
@@ -668,9 +796,19 @@ const showDeleteModal = ref(false);
 const postToDelete = ref(null);
 const deleteConfirmationText = ref("");
 
+// Reject post modal
+const showRejectPostModal = ref(false);
+const postToReject = ref(null);
+const rejectionReason = ref("");
+
 // Computed property for delete confirmation validation
 const isDeleteConfirmationValid = computed(() => {
     return deleteConfirmationText.value === postToDelete.value?.title;
+});
+
+// Computed property for reject reason validation
+const isRejectReasonValid = computed(() => {
+    return rejectionReason.value.trim().length >= 10;
 });
 
 // Computed property untuk hirarki kategori
@@ -954,39 +1092,11 @@ const viewPost = (post: any) => {
     router.push(`/anime/${post.id}`);
 };
 
-const editPost = async (post: any) => {
-    try {
-        const { updatePost } = useApi();
 
-        // Prepare update data
-        const updateData = {
-            id: post.id,
-            title: post.title,
-            category: post.category,
-            episodes: post.episodes,
-            year: post.year,
-            rating: post.rating,
-            cover: post.cover,
-            description: post.description,
-            // Tambahkan properti baru jika ada
-            downloadLinks: post.downloadLinks || [],
-            subtitleType: post.subtitleType || "",
-            releaseFileName: post.releaseFileName || ""
-        };
 
-        // Update post using API
-        const updatedPost = await updatePost(post.id, updateData);
-
-        if (updatedPost) {
-            // Refresh posts list
-            await fetchPosts();
-
-            console.log("Post updated successfully:", updatedPost);
-        }
-    } catch (error) {
-        console.error("Error updating post:", error);
-        alert(`Failed to update post: ${error.message || "Unknown error"}`);
-    }
+const editPost = (post: any) => {
+    // Navigate to edit page with admin flag
+    navigateTo(`/posts/edit/${post.id}?from=admin`);
 };
 
 const approvePost = async (post: any) => {
@@ -1012,27 +1122,9 @@ const approvePost = async (post: any) => {
     }
 };
 
-const rejectPost = async (post: any) => {
-    try {
-        const { rejectPost } = useApi();
-
-        // Update post status using API
-        const updatedPost = await rejectPost(post.id);
-
-        if (updatedPost) {
-            // Update local post status
-            const index = posts.value.findIndex(p => p.id === post.id);
-            if (index !== -1) {
-                posts.value[index].statusApproval = "rejected";
-            }
-
-            console.log("Post rejected successfully");
-            toast.success("Postingan berhasil ditolak");
-        }
-    } catch (error) {
-        console.error("Error rejecting post:", error);
-        toast.error(`Gagal menolak postingan: ${error.message || "Terjadi kesalahan tidak dikenal"}`);
-    }
+const rejectPost = (post: any) => {
+    // Show reject modal instead of directly rejecting
+    showRejectModal(post);
 };
 
 const deletePost = (post: any) => {
@@ -1041,16 +1133,31 @@ const deletePost = (post: any) => {
     showDeleteModal.value = true;
 };
 
+const isDeleting = ref(false);
+
 const confirmDelete = async () => {
-    if (!postToDelete.value || !isDeleteConfirmationValid.value) return;
+    if (!postToDelete.value || !isDeleteConfirmationValid.value || isDeleting.value) return;
 
     try {
+        isDeleting.value = true;
         const { deletePost } = useApi();
+
+        // Store post info before deletion for toast message
+        const deletedPostInfo = {
+            title: postToDelete.value.title,
+            releaseFileName: postToDelete.value.releaseFileName
+        };
 
         // Delete post using API
         await deletePost(postToDelete.value.id);
 
-        // Refresh posts list
+        // Remove post from local state immediately for better UX
+        const postIndex = posts.value.findIndex(p => p.id === postToDelete.value.id);
+        if (postIndex !== -1) {
+            posts.value.splice(postIndex, 1);
+        }
+
+        // Also refresh posts list to ensure consistency
         await fetchPosts();
 
         console.log("Post deleted successfully");
@@ -1060,11 +1167,14 @@ const confirmDelete = async () => {
         postToDelete.value = null;
         deleteConfirmationText.value = "";
         
-        // Show success toast
-        toast.success("Postingan berhasil dihapus");
+        // Show success toast with release file name
+        const displayName = deletedPostInfo.releaseFileName || deletedPostInfo.title;
+        toast.success(`Postingan "${displayName}" berhasil dihapus`);
     } catch (error) {
         console.error("Error deleting post:", error);
         toast.error(`Gagal menghapus postingan: ${error.message || "Terjadi kesalahan tidak dikenal"}`);
+    } finally {
+        isDeleting.value = false;
     }
 };
 
@@ -1072,6 +1182,50 @@ const cancelDelete = () => {
     showDeleteModal.value = false;
     postToDelete.value = null;
     deleteConfirmationText.value = "";
+};
+
+// Reject post modal functions
+const showRejectModal = (post: any) => {
+    postToReject.value = post;
+    rejectionReason.value = "";
+    showRejectPostModal.value = true;
+};
+
+const confirmReject = async () => {
+    if (!postToReject.value || !isRejectReasonValid.value) return;
+
+    try {
+        const { rejectPost } = useApi();
+
+        // Update post status using API with rejection reason
+        const updatedPost = await rejectPost(postToReject.value.id, rejectionReason.value);
+
+        if (updatedPost) {
+            // Update local post status and rejection reason
+            const index = posts.value.findIndex(p => p.id === postToReject.value.id);
+            if (index !== -1) {
+                posts.value[index].statusApproval = "rejected";
+                posts.value[index].rejectionReason = rejectionReason.value;
+            }
+
+            console.log("Post rejected successfully with reason");
+            toast.success("Postingan berhasil ditolak dengan alasan");
+        }
+
+        // Close modal and reset state
+        showRejectPostModal.value = false;
+        postToReject.value = null;
+        rejectionReason.value = "";
+    } catch (error) {
+        console.error("Error rejecting post:", error);
+        toast.error(`Gagal menolak postingan: ${error.message || "Terjadi kesalahan tidak dikenal"}`);
+    }
+};
+
+const cancelReject = () => {
+    showRejectPostModal.value = false;
+    postToReject.value = null;
+    rejectionReason.value = "";
 };
 
 const nextPage = () => {

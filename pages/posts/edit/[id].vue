@@ -74,7 +74,7 @@
 
                             <!-- Rejection Reason -->
                             <div
-                                v-if="post.statusApproval === 'rejected' && post.rejectionReason"
+                                v-if="post.statusApproval === 'rejected'"
                                 class="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md"
                             >
                                 <div class="flex">
@@ -84,7 +84,7 @@
                                             Alasan Penolakan:
                                         </h5>
                                         <p class="text-sm text-red-700 dark:text-red-300 mt-1">
-                                            {{ post.rejectionReason }}
+                                            {{ post.rejectionReason || 'Tidak ada alasan penolakan yang diberikan.' }}
                                         </p>
                                     </div>
                                 </div>
@@ -1489,12 +1489,21 @@ const updatePost = async () => {
         };
 
         // Memanggil API untuk memperbarui data di Supabase
-        await apiUpdatePost(postId, updatedData);
+        const updateResponse = await apiUpdatePost(postId, updatedData);
 
-        toast.success(successMessage);
+        // Check if status was automatically changed to pending due to content modification
+        if (updateResponse.statusChanged && updateResponse.statusChangeMessage) {
+            toast.warning(updateResponse.statusChangeMessage);
+        } else {
+            toast.success(successMessage);
+        }
 
-        // Redirect to posts page
-        await router.push("/posts");
+        // Redirect based on query parameter - if came from admin, go back to admin
+        if (route.query.from === 'admin') {
+            await router.push("/admin/posts");
+        } else {
+            await router.push("/posts");
+        }
     } catch (error: any) {
         console.error("Error updating post:", error);
         toast.error(error.message || "Terjadi kesalahan saat memperbarui postingan");

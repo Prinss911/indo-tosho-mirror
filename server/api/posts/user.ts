@@ -60,7 +60,8 @@ export default defineEventHandler(async event => {
             likes: post.likes,
             submittedAt: new Date(post.created_at), // Menggunakan created_at sebagai submittedAt
             createdAt: new Date(post.created_at),
-            updatedAt: post.updated_at ? new Date(post.updated_at) : undefined
+            updatedAt: post.updated_at ? new Date(post.updated_at) : undefined,
+            rejectionReason: post.rejection_reason // Menambahkan rejection_reason dari database
         }));
 
         return userPosts;

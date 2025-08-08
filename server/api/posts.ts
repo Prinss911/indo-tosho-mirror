@@ -155,7 +155,8 @@ export default defineEventHandler(async event => {
                 likes: data.likes,
                 submittedAt: new Date(), // Tidak ada submitted_at di database
                 createdAt: new Date(data.created_at),
-                updatedAt: data.updated_at ? new Date(data.updated_at) : undefined
+                updatedAt: data.updated_at ? new Date(data.updated_at) : undefined,
+                rejectionReason: data.rejection_reason // Menambahkan rejection_reason dari database
             };
 
             return newPost;
@@ -245,7 +246,8 @@ export default defineEventHandler(async event => {
                 likes: post.likes,
                 submittedAt: new Date(post.created_at), // Menggunakan created_at sebagai submittedAt
                 createdAt: new Date(post.created_at),
-                updatedAt: post.updated_at ? new Date(post.updated_at) : undefined
+                updatedAt: post.updated_at ? new Date(post.updated_at) : undefined,
+                rejectionReason: post.rejection_reason // Menambahkan rejection_reason dari database
             }));
 
             return posts;

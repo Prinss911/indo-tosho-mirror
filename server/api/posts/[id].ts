@@ -104,7 +104,8 @@ export default defineEventHandler(async event => {
                 likes: data.likes,
                 submittedAt: new Date(data.created_at), // Menggunakan created_at sebagai submittedAt
                 createdAt: new Date(data.created_at),
-                updatedAt: data.updated_at ? new Date(data.updated_at) : undefined
+                updatedAt: data.updated_at ? new Date(data.updated_at) : undefined,
+                rejectionReason: data.rejection_reason // Menambahkan rejection_reason dari database
             };
 
             return post;
@@ -151,10 +152,54 @@ export default defineEventHandler(async event => {
 
             const supabase = await serverSupabaseClient(event);
 
+            // Get current post status to check if it needs to be reset to pending
+            const { data: currentPost, error: fetchError } = await supabase
+                .from("posts")
+                .select("status_approval")
+                .eq("id", id)
+                .single();
+
+            if (fetchError) {
+                throw createError({
+                    statusCode: 404,
+                    statusMessage: "Post not found",
+                    data: {
+                        message: "Postingan tidak ditemukan",
+                        code: "POST_NOT_FOUND"
+                    }
+                });
+            }
+
             // Prepare data for Supabase using validated data
             const updateData: any = {
                 updated_at: new Date().toISOString()
             };
+
+            // Check if post content is being modified and needs re-review
+            const isContentModified = validatedData.title !== undefined ||
+                validatedData.titleEnglish !== undefined ||
+                validatedData.episodes !== undefined ||
+                validatedData.year !== undefined ||
+                validatedData.rating !== undefined ||
+                validatedData.category !== undefined ||
+                validatedData.cover !== undefined ||
+                validatedData.description !== undefined ||
+                validatedData.postDescription !== undefined ||
+                validatedData.genres !== undefined ||
+                validatedData.malId !== undefined ||
+                validatedData.releaseFileName !== undefined ||
+                validatedData.downloadLinks !== undefined ||
+                validatedData.subtitleType !== undefined;
+
+            // If content is modified and current status is rejected, reset to pending for re-review
+            // Only apply this logic for non-admin users
+            // Published posts remain published when edited
+            if (isContentModified && !ownershipResult.isAdmin && 
+                currentPost.status_approval === 'rejected') {
+                updateData.status_approval = 'pending';
+                // Clear rejection reason when resetting to pending
+                updateData.rejection_reason = null;
+            }
 
             // Only include fields that are provided and validated
             if (validatedData.title !== undefined) updateData.title = validatedData.title;
@@ -227,6 +272,11 @@ export default defineEventHandler(async event => {
                 postId: id
             });
 
+            // Check if status was changed to pending for re-review
+            const statusChangedToPending = isContentModified && !ownershipResult.isAdmin && 
+                currentPost.status_approval === 'rejected' &&
+                updateData.status_approval === 'pending';
+
             // Format response to match UserPost interface
             const updatedPost: UserPost = {
                 id: data.id,
@@ -261,10 +311,18 @@ export default defineEventHandler(async event => {
                 likes: data.likes,
                 submittedAt: new Date(data.created_at), // Menggunakan created_at sebagai submittedAt
                 createdAt: new Date(data.created_at),
-                updatedAt: data.updated_at ? new Date(data.updated_at) : undefined
+                updatedAt: data.updated_at ? new Date(data.updated_at) : undefined,
+                rejectionReason: data.rejection_reason // Menambahkan rejection_reason dari database
             };
 
-            return updatedPost;
+            // Return response with status change information
+            return {
+                ...updatedPost,
+                statusChanged: statusChangedToPending,
+                statusChangeMessage: statusChangedToPending ? 
+                    "Postingan yang sebelumnya ditolak telah diperbarui dan status berubah menjadi 'Menunggu Review' untuk peninjauan ulang." : 
+                    undefined
+            };
         } catch (error: any) {
             console.error(`Error updating post ${id}:`, error);
 
@@ -308,10 +366,32 @@ export default defineEventHandler(async event => {
                 isAdmin: ownershipResult.isAdmin
             });
 
-            const supabase = await serverSupabaseClient(event);
+            // Use service role key to bypass RLS for delete operations
+            const config = useRuntimeConfig();
+            const { createClient } = await import("@supabase/supabase-js");
+            
+            // Validate that service role key is available
+            const serviceRoleKey = config.supabaseServiceKey || process.env.SUPABASE_SERVICE_ROLE_KEY;
+            
+            if (!serviceRoleKey) {
+                console.error("[API] Service role key not found in environment variables");
+                throw createError({
+                    statusCode: 500,
+                    statusMessage: "Server configuration error"
+                });
+            }
+            
+            // Create Supabase client with service role key to bypass RLS
+            const supabase = createClient(config.public.supabase.url, serviceRoleKey, {
+                auth: {
+                    autoRefreshToken: false,
+                    persistSession: false
+                }
+            });
 
             // Delete from Supabase
-            const { error } = await supabase.from("posts").delete().eq("id", id);
+            console.log(`Attempting to delete post ${id} from Supabase...`);
+            const { data: deletedData, error } = await supabase.from("posts").delete().eq("id", id).select();
 
             if (error) {
                 console.error(`Supabase error deleting post ${id}:`, error);
@@ -330,6 +410,19 @@ export default defineEventHandler(async event => {
                         message: "Terjadi kesalahan saat menghapus postingan",
                         code: "DATABASE_ERROR"
                     }
+                });
+            }
+
+            console.log(`Post ${id} deletion result:`, { deletedData, affectedRows: deletedData?.length || 0 });
+            
+            // Check if any rows were actually deleted
+            if (!deletedData || deletedData.length === 0) {
+                console.warn(`No rows were deleted for post ${id}. Post may not exist.`);
+                
+                // Log security event for no rows affected
+                logSecurityEvent(event, "POST_DELETE_NO_ROWS", {
+                    userId: ownershipResult.user?.id,
+                    postId: id
                 });
             }
 

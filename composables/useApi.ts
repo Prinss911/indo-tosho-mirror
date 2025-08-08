@@ -48,6 +48,12 @@ export interface UserPost {
     submittedAt: Date;
     createdAt: Date;
     updatedAt?: Date;
+    rejectionReason?: string; // Alasan penolakan postingan
+}
+
+export interface UpdatePostResponse extends UserPost {
+    statusChanged?: boolean; // Apakah status berubah menjadi pending
+    statusChangeMessage?: string; // Pesan notifikasi perubahan status
 }
 
 export const useApi = () => {
@@ -82,9 +88,9 @@ export const useApi = () => {
         }
     };
 
-    const updatePost = async (id: string, postData: Partial<PostData>): Promise<UserPost> => {
+    const updatePost = async (id: string, postData: Partial<PostData>): Promise<UpdatePostResponse> => {
         try {
-            const response = await $fetch<UserPost>(`${baseUrl}/posts/${id}`, {
+            const response = await $fetch<UpdatePostResponse>(`${baseUrl}/posts/${id}`, {
                 method: "PUT",
                 body: postData
             });
@@ -201,10 +207,13 @@ export const useApi = () => {
         }
     };
 
-    const rejectPost = async (id: string): Promise<UserPost> => {
+    const rejectPost = async (id: string, rejectionReason?: string): Promise<UserPost> => {
         try {
             const response = await $fetch<UserPost>(`${baseUrl}/posts/${id}/reject`, {
-                method: "POST"
+                method: "POST",
+                body: {
+                    rejectionReason
+                }
             });
             return response;
         } catch (error: any) {

@@ -227,10 +227,13 @@ describe("useApi Composable", () => {
             const rejectedPost = { ...mockUserPost, status: "rejected" as const };
             mockFetch.mockResolvedValue(rejectedPost);
 
-            const result = await api.rejectPost("1");
+            const result = await api.rejectPost("1", "Test rejection reason");
 
             expect(mockFetch).toHaveBeenCalledWith("/api/posts/1/reject", {
-                method: "POST"
+                method: "POST",
+                body: {
+                    rejectionReason: "Test rejection reason"
+                }
             });
             expect(result).toEqual(rejectedPost);
         });
@@ -239,7 +242,7 @@ describe("useApi Composable", () => {
             const error = new Error("Reject failed");
             mockFetch.mockRejectedValue(error);
 
-            await expect(api.rejectPost("1")).rejects.toThrow("Reject failed");
+            await expect(api.rejectPost("1", "Test rejection reason")).rejects.toThrow("Reject failed");
         });
     });
 

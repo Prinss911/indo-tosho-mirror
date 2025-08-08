@@ -1,7 +1,30 @@
 import type { UserPost } from "~/composables/useApi";
-import { serverSupabaseClient } from "#supabase/server";
+import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { createClient } from "@supabase/supabase-js";
 
 export default defineEventHandler(async event => {
+    // Validate HTTP method
+    if (event.node.req.method !== "POST") {
+        throw createError({
+            statusCode: 405,
+            statusMessage: "Method Not Allowed"
+        });
+    }
+
+    // Validate content length
+    const contentLength = event.node.req.headers["content-length"];
+    if (contentLength && parseInt(contentLength) > 1024 * 1024) { // 1MB limit
+        throw createError({
+            statusCode: 413,
+            statusMessage: "Request Entity Too Large"
+        });
+    }
+
+    // Security headers
+    setHeader(event, "X-Content-Type-Options", "nosniff");
+    setHeader(event, "X-Frame-Options", "DENY");
+    setHeader(event, "X-XSS-Protection", "1; mode=block");
+
     const id = event.context.params?.id;
 
     if (!id) {
@@ -12,36 +35,61 @@ export default defineEventHandler(async event => {
     }
 
     try {
-        const supabase = await serverSupabaseClient(event);
-
-        // Get user role to ensure only admins can approve posts
-        const {
-            data: { user }
-        } = await supabase.auth.getUser();
-
+        // Get authenticated user for authorization
+        const user = await serverSupabaseUser(event);
+        
         if (!user) {
+            console.warn(`[SECURITY] Unauthorized approve attempt for post ${id}`);
             throw createError({
                 statusCode: 401,
                 statusMessage: "Unauthorized"
             });
         }
 
-        // Check if user is admin (you may need to adjust this based on your auth setup)
-        const { data: userProfile, error: profileError } = await supabase
+        // Check if user is admin using regular client
+        const userSupabase = await serverSupabaseClient(event);
+        const { data: userProfile, error: profileError } = await userSupabase
             .from("profiles")
             .select("role")
             .eq("id", user.id)
             .single();
 
         if (profileError || !userProfile || userProfile.role !== "admin") {
+            console.warn(`[SECURITY] Unauthorized approve attempt by user ${user.id} for post ${id}`);
             throw createError({
                 statusCode: 403,
                 statusMessage: "Forbidden: Only admins can approve posts"
             });
         }
 
-        // Update post status to published
-        const { data, error } = await supabase
+        console.log(`[SECURITY] Admin ${user.id} authorized to approve post ${id}`);
+
+        // Get Supabase service role key for bypassing RLS
+        const config = useRuntimeConfig();
+        const serviceRoleKey = config.supabaseServiceKey;
+        
+        if (!serviceRoleKey) {
+            console.error("[CONFIG] Supabase service role key not found in runtime config");
+            throw createError({
+                statusCode: 500,
+                statusMessage: "Server configuration error"
+            });
+        }
+
+        // Create Supabase client with service role key to bypass RLS
+        const adminSupabase = createClient(
+            config.public.supabaseUrl,
+            serviceRoleKey,
+            {
+                auth: {
+                    autoRefreshToken: false,
+                    persistSession: false
+                }
+            }
+        );
+
+        // Update post status to published using admin client
+        const { data, error } = await adminSupabase
             .from("posts")
             .update({ status_approval: "published", updated_at: new Date().toISOString() })
             .eq("id", id)
@@ -49,12 +97,14 @@ export default defineEventHandler(async event => {
             .single();
 
         if (error) {
-            console.error(`Supabase error approving post ${id}:`, error);
+            console.error(`[DATABASE] Supabase error approving post ${id}:`, error);
             throw createError({
                 statusCode: 500,
                 statusMessage: "Error approving post in database"
             });
         }
+
+        console.log(`[SUCCESS] Post ${id} approved successfully by admin ${user.id}`);
 
         // Format response to match UserPost interface
         const publishedPost: UserPost = {
@@ -88,12 +138,13 @@ export default defineEventHandler(async event => {
             likes: data.likes,
             submittedAt: new Date(data.created_at), // Menggunakan created_at sebagai submittedAt
             createdAt: new Date(data.created_at),
-            updatedAt: data.updated_at ? new Date(data.updated_at) : undefined
+            updatedAt: data.updated_at ? new Date(data.updated_at) : undefined,
+            rejectionReason: data.rejection_reason // Menambahkan rejection_reason dari database
         };
 
         return publishedPost;
     } catch (error) {
-        console.error(`Error approving post ${id}:`, error);
+        console.error(`[ERROR] Error approving post ${id}:`, error);
         throw error;
     }
 });
