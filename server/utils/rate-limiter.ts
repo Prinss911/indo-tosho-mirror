@@ -161,7 +161,7 @@ export const endpointRateLimiters = {
     }),
     postsDelete: createUserRateLimiter({
         windowMs: 60 * 1000, // 1 minute
-        maxRequests: 3 // 3 deletes per minute
+        maxRequests: 10 // 10 deletes per minute
     }),
     postsRead: createRateLimiter({
         windowMs: 60 * 1000, // 1 minute

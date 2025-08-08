@@ -157,8 +157,8 @@ export const useApi = () => {
                 error.message = apiError.message ?? apiError.statusMessage ?? "Error deleting post";
             }
 
-            // Untuk deletePost, kita tetap mengembalikan false daripada melempar error
-            return false;
+            // Melempar error agar bisa ditangani oleh caller
+            throw error;
         }
     };
 

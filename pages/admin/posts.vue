@@ -291,37 +291,84 @@
                                 <div class="flex items-center space-x-2">
                                     <button
                                         @click="viewPost(post)"
-                                        class="inline-flex items-center p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                                        class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 action-btn"
                                         title="Lihat Detail"
                                     >
-                                        <EyeIcon class="h-4 w-4" />
+                                        <DocumentTextIcon class="h-4 w-4" />
                                     </button>
                                     <button
                                         @click="editPost(post)"
-                                        class="inline-flex items-center p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                                        class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 action-btn"
                                         title="Edit Postingan"
                                     >
                                         <PencilIcon class="h-4 w-4" />
                                     </button>
-                                    <button
-                                        v-if="post.statusApproval === 'pending'"
-                                        @click="approvePost(post)"
-                                        class="inline-flex items-center p-2 border border-green-300 dark:border-green-600 rounded-md shadow-sm text-sm font-medium text-green-700 dark:text-green-400 bg-white dark:bg-gray-700 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors"
-                                        title="Approve Post"
-                                    >
-                                        <CheckIcon class="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        v-if="post.statusApproval === 'pending'"
-                                        @click="rejectPost(post)"
-                                        class="inline-flex items-center p-2 border border-red-300 dark:border-red-600 rounded-md shadow-sm text-sm font-medium text-red-700 dark:text-red-400 bg-white dark:bg-gray-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                                        title="Reject Post"
-                                    >
-                                        <XMarkIcon class="h-4 w-4" />
-                                    </button>
+                                    <Menu as="div" class="relative inline-block text-left" v-if="post.statusApproval === 'pending'">
+                                        <MenuButton
+                                            class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 action-btn"
+                                            title="More Actions"
+                                        >
+                                            <EllipsisVerticalIcon class="h-4 w-4" />
+                                        </MenuButton>
+                                        <transition
+                                            enter-active-class="transition ease-out duration-100"
+                                            enter-from-class="transform opacity-0 scale-95"
+                                            enter-to-class="transform opacity-100 scale-100"
+                                            leave-active-class="transition ease-in duration-75"
+                                            leave-from-class="transform opacity-100 scale-100"
+                                            leave-to-class="transform opacity-0 scale-95"
+                                        >
+                                            <MenuItems
+                                                class="absolute right-0 origin-top-right divide-y divide-gray-100 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10 mt-2"
+                                            >
+                                                <div class="px-1 py-1">
+                                                    <MenuItem v-slot="{ active }">
+                                                        <button
+                                                            @click="approvePost(post)"
+                                                            :class="[
+                                                                active
+                                                                    ? 'bg-emerald-500 text-white'
+                                                                    : 'text-gray-900 dark:text-gray-100',
+                                                                'group flex w-full items-center rounded-md px-2 py-2 text-sm'
+                                                            ]"
+                                                        >
+                                                            <CheckCircleIcon
+                                                                class="mr-2 h-5 w-5"
+                                                                :class="
+                                                                    active ? 'text-white' : 'text-emerald-500'
+                                                                "
+                                                            />
+                                                            Approve Post
+                                                        </button>
+                                                    </MenuItem>
+                                                    <MenuItem v-slot="{ active }">
+                                                        <button
+                                                            @click="rejectPost(post)"
+                                                            :class="[
+                                                                active
+                                                                    ? 'bg-orange-500 text-white'
+                                                                    : 'text-gray-900 dark:text-gray-100',
+                                                                'group flex w-full items-center rounded-md px-2 py-2 text-sm'
+                                                            ]"
+                                                        >
+                                                            <XCircleIcon
+                                                                class="mr-2 h-5 w-5"
+                                                                :class="
+                                                                    active
+                                                                        ? 'text-white'
+                                                                        : 'text-orange-500'
+                                                                "
+                                                            />
+                                                            Reject Post
+                                                        </button>
+                                                    </MenuItem>
+                                                </div>
+                                            </MenuItems>
+                                        </transition>
+                                    </Menu>
                                     <button
                                         @click="deletePost(post)"
-                                        class="inline-flex items-center p-2 border border-red-300 dark:border-red-600 rounded-md shadow-sm text-sm font-medium text-red-700 dark:text-red-400 bg-white dark:bg-gray-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                        class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 action-btn"
                                         title="Hapus Postingan"
                                     >
                                         <TrashIcon class="h-4 w-4" />
@@ -489,6 +536,65 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Delete Confirmation Modal -->
+            <div v-if="showDeleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+                <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+                    <div class="mt-3">
+                        <div
+                            class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900 mb-4"
+                        >
+                            <TrashIcon class="h-6 w-6 text-red-600 dark:text-red-400" />
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white text-center mb-4">Hapus Postingan</h3>
+                        <div class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                            <p class="mb-3 text-center">
+                                Anda akan menghapus postingan <strong>{{ postToDelete?.title }}</strong>
+                            </p>
+                            <div
+                                class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-3 mb-4"
+                            >
+                                <p class="text-red-800 dark:text-red-200 text-xs">
+                                    ⚠️ <strong>Peringatan:</strong> Tindakan ini tidak dapat dibatalkan. Postingan akan dihapus permanen.
+                                </p>
+                            </div>
+                            <p class="mb-2 font-medium">
+                                Ketik
+                                <code class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-xs">{{ postToDelete?.title }}</code>
+                                untuk konfirmasi:
+                            </p>
+                            <input
+                                v-model="deleteConfirmationText"
+                                type="text"
+                                placeholder="Ketik judul postingan untuk konfirmasi"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                            />
+                        </div>
+                        <div class="flex justify-center space-x-3">
+                            <button
+                                type="button"
+                                @click="cancelDelete"
+                                class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                            >
+                                Batal
+                            </button>
+                            <button
+                                type="button"
+                                @click="confirmDelete"
+                                :disabled="!isDeleteConfirmationValid"
+                                :class="[
+                                    'px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white transition-colors',
+                                    isDeleteConfirmationValid
+                                        ? 'bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
+                                        : 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
+                                ]"
+                            >
+                                Hapus Postingan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </ClientOnly>
 </template>
@@ -500,6 +606,7 @@ import { useSupabase } from "~/services/supabaseClient";
 import { v4 as uuidv4 } from "uuid";
 import { useAnimeStore } from "~/stores/anime";
 import { useApi } from "~/composables/useApi";
+import { useToast } from "vue-toastification";
 import {
     ArrowLeftIcon,
     PlusIcon,
@@ -519,8 +626,10 @@ import {
     TagIcon,
     CalendarIcon,
     UserIcon,
-    ExclamationTriangleIcon
+    ExclamationTriangleIcon,
+    EllipsisVerticalIcon
 } from "@heroicons/vue/24/outline";
+import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/vue";
 
 // Middleware
 definePageMeta({
@@ -528,6 +637,7 @@ definePageMeta({
 });
 
 const router = useRouter();
+const toast = useToast();
 
 // Reactive state
 const searchQuery = ref("");
@@ -552,6 +662,16 @@ const newPost = ref({
 const posts = ref([]);
 // Categories data from API
 const categories = ref([]);
+
+// Delete confirmation modal
+const showDeleteModal = ref(false);
+const postToDelete = ref(null);
+const deleteConfirmationText = ref("");
+
+// Computed property for delete confirmation validation
+const isDeleteConfirmationValid = computed(() => {
+    return deleteConfirmationText.value === postToDelete.value?.title;
+});
 
 // Computed property untuk hirarki kategori
 const hierarchicalCategories = computed(() => {
@@ -884,10 +1004,11 @@ const approvePost = async (post: any) => {
             }
 
             console.log("Post published successfully");
+            toast.success("Postingan berhasil disetujui");
         }
     } catch (error) {
         console.error("Error approving post:", error);
-        alert(`Failed to approve post: ${error.message || "Unknown error"}`);
+        toast.error(`Gagal menyetujui postingan: ${error.message || "Terjadi kesalahan tidak dikenal"}`);
     }
 };
 
@@ -906,34 +1027,51 @@ const rejectPost = async (post: any) => {
             }
 
             console.log("Post rejected successfully");
+            toast.success("Postingan berhasil ditolak");
         }
     } catch (error) {
         console.error("Error rejecting post:", error);
-        alert(`Failed to reject post: ${error.message || "Unknown error"}`);
+        toast.error(`Gagal menolak postingan: ${error.message || "Terjadi kesalahan tidak dikenal"}`);
     }
 };
 
-const deletePost = async (post: any) => {
-    if (confirm(`Are you sure you want to delete post "${post.title}"?`)) {
-        try {
-            const { deletePost } = useApi();
+const deletePost = (post: any) => {
+    postToDelete.value = post;
+    deleteConfirmationText.value = "";
+    showDeleteModal.value = true;
+};
 
-            // Delete post using API
-            const success = await deletePost(post.id);
+const confirmDelete = async () => {
+    if (!postToDelete.value || !isDeleteConfirmationValid.value) return;
 
-            if (success) {
-                // Refresh posts list
-                await fetchPosts();
+    try {
+        const { deletePost } = useApi();
 
-                console.log("Post deleted successfully");
-            } else {
-                throw new Error("Failed to delete post");
-            }
-        } catch (error) {
-            console.error("Error deleting post:", error);
-            alert(`Failed to delete post: ${error.message || "Unknown error"}`);
-        }
+        // Delete post using API
+        await deletePost(postToDelete.value.id);
+
+        // Refresh posts list
+        await fetchPosts();
+
+        console.log("Post deleted successfully");
+        
+        // Close modal and reset state
+        showDeleteModal.value = false;
+        postToDelete.value = null;
+        deleteConfirmationText.value = "";
+        
+        // Show success toast
+        toast.success("Postingan berhasil dihapus");
+    } catch (error) {
+        console.error("Error deleting post:", error);
+        toast.error(`Gagal menghapus postingan: ${error.message || "Terjadi kesalahan tidak dikenal"}`);
     }
+};
+
+const cancelDelete = () => {
+    showDeleteModal.value = false;
+    postToDelete.value = null;
+    deleteConfirmationText.value = "";
 };
 
 const nextPage = () => {
@@ -961,5 +1099,9 @@ const goToPage = (page: number) => {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+.action-btn {
+    @apply inline-flex items-center p-2 rounded-md transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-700;
 }
 </style>
