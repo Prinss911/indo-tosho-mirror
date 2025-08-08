@@ -1,10 +1,9 @@
 # TODO:
 
-- [x] 1: Analisis struktur halaman top-rated.vue dan composable useTopRated (priority: High)
-- [x] 2: Buat unit test untuk rendering komponen dasar top-rated.vue (priority: High)
-- [x] 3: Buat unit test untuk composable useTopRated dengan mock API calls dan data (priority: High)
-- [x] 4: Jalankan test untuk memastikan semua unit test berfungsi dengan baik (priority: Medium)
-- [x] 5: Buat unit test untuk fungsionalitas filter dan sorting (priority: Medium)
-- [x] 6: Buat unit test untuk status loading dan penanganan error (priority: Medium)
-- [x] 7: Buat unit test untuk interaksi pengguna (perubahan kriteria, kategori, tahun) (priority: Medium)
-- [x] 8: Buat unit test untuk fungsionalitas modal post terkait (priority: Low)
+- [x] 1: Ganti tombol edit tunggal dengan dropdown menu yang berisi opsi Edit Post, Quick Edit, dan View Details (priority: High)
+- [x] 2: Buat modal edit post user yang memungkinkan admin mengedit semua field post (priority: High)
+- [x] 3: Perbaiki fungsi rejectPost untuk menampilkan modal input alasan penolakan (priority: High)
+- [x] 4: Tambahkan quick actions dengan konfirmasi dan bulk actions untuk multiple posts (priority: Medium)
+- [ ] 5: Implementasi filter berdasarkan submitter dan export data posts (**IN PROGRESS**) (priority: Medium)
+- [ ] 7: Test semua fitur moderasi dan pastikan terintegrasi dengan API yang ada (priority: Medium)
+- [ ] 6: Tambahkan loading states, toast notifications, dan responsive design (priority: Low)

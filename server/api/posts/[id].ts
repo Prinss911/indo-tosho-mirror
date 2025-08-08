@@ -176,8 +176,10 @@ export default defineEventHandler(async event => {
             if (validatedData.subtitleType !== undefined) updateData.subtitle_type = validatedData.subtitleType;
             if (validatedData.submitterName !== undefined) updateData.submitter_name = validatedData.submitterName;
 
-            // Only admins can change status_approval
-            if (validatedData.statusApproval !== undefined && ownershipResult.isAdmin) {
+            // Allow owners and admins to change status_approval
+            // Owners can change their own post status (e.g., from rejected to pending for re-review)
+            // Admins can change any post status
+            if (validatedData.statusApproval !== undefined && (ownershipResult.isOwner || ownershipResult.isAdmin)) {
                 updateData.status_approval = validatedData.statusApproval;
             }
 

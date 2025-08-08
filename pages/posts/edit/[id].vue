@@ -66,9 +66,9 @@
                                 </div>
                                 <span
                                     class="inline-flex px-3 py-1 text-sm font-medium rounded-full"
-                                    :class="getStatusClass(post.status)"
+                                    :class="getStatusClass(post.statusApproval)"
                                 >
-                                    {{ getStatusText(post.status) }}
+                                    {{ getStatusText(post.statusApproval) }}
                                 </span>
                             </div>
 
@@ -889,9 +889,18 @@
                                             }}</strong
                                             >"?
                                         </p>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                                            Postingan yang diperbarui akan langsung dipublikasikan dan dapat dilihat
-                                            oleh pengguna lain.
+                                        <!-- Pesan dinamis berdasarkan status saat ini -->
+                                        <p v-if="post?.statusApproval === 'rejected'" class="text-sm text-amber-600 dark:text-amber-400 mt-2 font-medium">
+                                            ⚠️ Postingan yang ditolak ini akan dikirim ulang untuk review setelah diperbarui.
+                                        </p>
+                                        <p v-else-if="post?.statusApproval === 'published'" class="text-sm text-green-600 dark:text-green-400 mt-2">
+                                            ✅ Postingan yang sudah dipublikasikan ini akan tetap dipublikasikan setelah diperbarui.
+                                        </p>
+                                        <p v-else-if="post?.statusApproval === 'pending'" class="text-sm text-blue-600 dark:text-blue-400 mt-2">
+                                            ⏳ Postingan yang sedang menunggu review ini akan tetap dalam status pending setelah diperbarui.
+                                        </p>
+                                        <p v-else class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                                            Postingan yang diperbarui akan disimpan dengan status yang sesuai.
                                         </p>
                                     </div>
                                 </div>
@@ -968,17 +977,26 @@ interface UserPost {
     year: number;
     rating: number;
     category: string;
-    status: "pending" | "published" | "rejected";
+    status: "Finished Airing" | "Currently Airing" | "Not yet aired" | "completed" | "ongoing" | "upcoming"; // Status anime
+    statusApproval: "pending" | "published" | "rejected"; // Status persetujuan
     cover: string;
     description: string;
+    postDescription?: string;
     genres: string[];
     malId?: number;
-    submitter: string;
+    releaseFileName?: string;
+    downloadLinks?: { hosting: string; url: string }[];
+    subtitleType?: string;
+    downloadLink?: string;
+    softsubLink?: string;
+    submitterId: string;
+    submitterName: string;
     views: number;
     downloads: number;
     likes: number;
+    submittedAt: Date;
     createdAt: Date;
-    updatedAt: Date;
+    updatedAt?: Date;
     rejectionReason?: string;
 }
 
@@ -1062,8 +1080,8 @@ const toggleReadOnlyForm = () => {
     isReadOnlyFormCollapsed.value = !isReadOnlyFormCollapsed.value;
 };
 
-const getStatusClass = (status: string) => {
-    switch (status) {
+const getStatusClass = (statusApproval: string) => {
+    switch (statusApproval) {
         case "published":
             return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
         case "pending":
@@ -1075,8 +1093,8 @@ const getStatusClass = (status: string) => {
     }
 };
 
-const getStatusText = (status: string) => {
-    switch (status) {
+const getStatusText = (statusApproval: string) => {
+    switch (statusApproval) {
         case "published":
             return "Dipublikasikan";
         case "pending":
@@ -1436,6 +1454,22 @@ const updatePost = async () => {
     try {
         const postId = route.params.id as string;
 
+        // Tentukan status approval berdasarkan status saat ini
+        let newStatusApproval = post.value.statusApproval;
+        let successMessage = `Postingan "${postForm.title}" berhasil diperbarui!`;
+
+        // Logika status berdasarkan permintaan:
+        // - Jika status saat ini 'rejected', ubah menjadi 'pending' untuk review ulang
+        // - Jika status saat ini 'published', tetap 'published'
+        // - Jika status saat ini 'pending', tetap 'pending'
+        if (post.value.statusApproval === 'rejected') {
+            newStatusApproval = 'pending';
+            successMessage = `Postingan "${postForm.title}" berhasil diperbarui dan dikirim untuk review ulang!`;
+        } else if (post.value.statusApproval === 'published') {
+            newStatusApproval = 'published';
+            successMessage = `Postingan "${postForm.title}" berhasil diperbarui dan tetap dipublikasikan!`;
+        }
+
         // Menyiapkan data yang akan diperbarui
         const updatedData = {
             title: postForm.title,
@@ -1450,14 +1484,14 @@ const updatePost = async () => {
             releaseFileName: postForm.releaseFileName,
             downloadLinks: postForm.downloadLinks.filter(link => link.hosting.trim() && link.url.trim()),
             subtitleType: postForm.subtitleType,
-            postDescription: postForm.postDescription
-            // Tidak perlu mengatur status karena akan otomatis disetujui di backend
+            postDescription: postForm.postDescription,
+            statusApproval: newStatusApproval // Menambahkan status approval yang baru
         };
 
         // Memanggil API untuk memperbarui data di Supabase
         await apiUpdatePost(postId, updatedData);
 
-        toast.success(`Postingan "${postForm.title}" berhasil diperbarui dan dipublikasikan!`);
+        toast.success(successMessage);
 
         // Redirect to posts page
         await router.push("/posts");
