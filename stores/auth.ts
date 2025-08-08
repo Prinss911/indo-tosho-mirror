@@ -130,14 +130,16 @@ export const useAuthStore = defineStore("auth", () => {
                 return { success: false, error: error.value };
             }
 
-            // Fetch user profile from profiles table
-            const { data: profileData, error: profileError } = await supabase
-                .from("profiles")
-                .select("username, role, created_at, status")
-                .eq("id", data.user.id)
-                .single();
-
-            if (profileError) {
+            // Fetch user profile using server-side API
+            let profileData;
+            try {
+                profileData = await $fetch('/api/auth/get-profile', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+            } catch (profileError) {
                 // Don't log sensitive profile errors
                 error.value = "Terjadi kesalahan saat mengambil profil pengguna";
                 return { success: false, error: error.value };
@@ -336,14 +338,16 @@ export const useAuthStore = defineStore("auth", () => {
             const { data } = await supabase.auth.getSession();
 
             if (data.session?.user) {
-                // Fetch user profile from profiles table
-                const { data: profileData, error: profileError } = await supabase
-                    .from("profiles")
-                    .select("username, role, created_at, status")
-                    .eq("id", data.session.user.id)
-                    .single();
-
-                if (profileError) {
+                // Fetch user profile using server-side API
+                let profileData;
+                try {
+                    profileData = await $fetch('/api/auth/get-profile', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                } catch (profileError) {
                     // Don't log sensitive profile errors
                     user.value = null;
                     return;
@@ -359,19 +363,8 @@ export const useAuthStore = defineStore("auth", () => {
                     return;
                 }
 
-                // Update role if not set
-                if (profileData && !profileData.role) {
-                    await supabase.from("profiles").update({ role: "user" }).eq("id", data.session.user.id);
-                }
-
-                // Get latest role data
-                const { data: roleData } = await supabase
-                    .from("profiles")
-                    .select("role")
-                    .eq("id", data.session.user.id)
-                    .single();
-
-                const userRole = roleData?.role ?? profileData?.role ?? "user";
+                // Role is already fetched from server-side API
+                const userRole = profileData?.role ?? "user";
 
                 // Validate existing session if available
                 if (sessionId.value) {

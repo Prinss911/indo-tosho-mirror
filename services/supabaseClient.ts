@@ -30,39 +30,32 @@ export const useSupabase = () => {
      * Check if the user has admin role
      */
     const isAdmin = async (): Promise<boolean> => {
-        if (!user.value) {
-            if (process.env.NODE_ENV === "development") {
-                console.log("isAdmin check - no user found");
-            }
-            return false;
-        }
-
         try {
-            // Fetch user's role from the profiles table
-            const { data, error } = await supabase.from("profiles").select("role").eq("id", user.value.id).single();
-
-            if (error) {
+            const currentUser = await getCurrentUser();
+            if (!currentUser) {
                 if (process.env.NODE_ENV === "development") {
-                    console.error("Error checking admin status:", error);
+                    console.log("No authenticated user found");
                 }
                 return false;
             }
-
-            if (!data) {
-                if (process.env.NODE_ENV === "development") {
-                    console.log("No profile data found for user");
-                }
-                return false;
-            }
-
-            // Explicitly check for 'admin' role
-            const isUserAdmin = data.role === "admin";
 
             if (process.env.NODE_ENV === "development") {
-                console.log("isAdmin result:", isUserAdmin);
+                console.log("Checking admin status for user:", currentUser.id);
             }
 
-            return isUserAdmin;
+            // Use server-side API endpoint to check admin status
+            const response = await $fetch('/api/auth/check-admin', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (process.env.NODE_ENV === "development") {
+                console.log("Admin check response:", response);
+            }
+
+            return response?.isAdmin || false;
         } catch (err) {
             if (process.env.NODE_ENV === "development") {
                 console.error("Unexpected error in isAdmin check:", err);
