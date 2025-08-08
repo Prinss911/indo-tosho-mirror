@@ -351,29 +351,7 @@
                                                                     v-slot="{ active }"
                                                                 >
                                                                     <button
-                                                                        @click="toggleUserStatus(user, 'banned', true)"
-                                                                        :class="[
-                                                                            active
-                                                                                ? 'bg-red-500 text-white'
-                                                                                : 'text-gray-900 dark:text-gray-100',
-                                                                            'group flex w-full items-center rounded-md px-2 py-2 text-sm'
-                                                                        ]"
-                                                                    >
-                                                                        <TrashIcon
-                                                                            class="mr-2 h-5 w-5"
-                                                                            :class="
-                                                                                active ? 'text-white' : 'text-red-500'
-                                                                            "
-                                                                        />
-                                                                        Banned (Hapus Rilisan)
-                                                                    </button>
-                                                                </MenuItem>
-                                                                <MenuItem
-                                                                    v-if="user.status !== 'banned'"
-                                                                    v-slot="{ active }"
-                                                                >
-                                                                    <button
-                                                                        @click="toggleUserStatus(user, 'banned', false)"
+                                                                        @click="toggleUserStatus(user, 'banned')"
                                                                         :class="[
                                                                             active
                                                                                 ? 'bg-red-500 text-white'
@@ -387,7 +365,7 @@
                                                                                 active ? 'text-white' : 'text-red-500'
                                                                             "
                                                                         />
-                                                                        Banned (Pertahankan Rilisan)
+                                                                        Banned
                                                                     </button>
                                                                 </MenuItem>
                                                             </div>
