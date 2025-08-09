@@ -78,7 +78,7 @@ export default defineEventHandler(async event => {
 
         // Create Supabase client with service role key to bypass RLS
         const adminSupabase = createClient(
-            config.public.supabaseUrl,
+            config.public.supabase.url,
             serviceRoleKey,
             {
                 auth: {
