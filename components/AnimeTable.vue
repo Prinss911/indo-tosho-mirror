@@ -19,7 +19,6 @@
                             >
                                 <option value="date" class="bg-white dark:bg-gray-800">📅 Date</option>
                                 <option value="title" class="bg-white dark:bg-gray-800">📝 Title</option>
-                                <option value="downloads" class="bg-white dark:bg-gray-800">📥 Downloads</option>
                             </select>
                             <!-- Sembunyikan ikon saat dropdown terbuka -->
                             <ChevronDownIcon
@@ -239,10 +238,6 @@
                                     <EyeIcon class="w-3 h-3 mr-1" />
                                     <span>{{ formatNumber(anime.views) }} Views</span>
                                 </div>
-                                <div class="flex items-center text-green-600 dark:text-green-400">
-                                    <ArrowDownIcon class="w-3 h-3 mr-1" />
-                                    <span>{{ formatNumber(anime.downloads) }} Downloads</span>
-                                </div>
                                 <div class="flex items-center text-red-500 dark:text-red-400">
                                     <HeartIcon class="w-3 h-3 mr-1" />
                                     <span>{{ anime.likes ?? 0 }} Likes</span>
@@ -271,7 +266,6 @@ import {
     ChevronUpIcon,
     ChevronDownIcon,
     EyeIcon,
-    ArrowDownIcon,
     ExclamationTriangleIcon,
     FilmIcon,
     HeartIcon

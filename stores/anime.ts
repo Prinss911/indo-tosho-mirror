@@ -434,9 +434,14 @@ export const useAnimeStore = defineStore("anime", {
                     return this.animes.find(anime => String(anime.id) === String(id));
                 }
 
-                // Fetch submitter username from profiles table
+                // Get submitter username with priority: submitter_name from post -> username from profiles -> "Unknown"
                 let submitterUsername = "Unknown";
-                if (data.submitter_id) {
+                
+                // First priority: use submitter_name from posts table if available
+                if (data.submitter_name) {
+                    submitterUsername = data.submitter_name;
+                } else if (data.submitter_id) {
+                    // Second priority: fetch username from profiles table using submitter_id
                     const { data: profileData, error: profileError } = await supabase
                         .from("profiles")
                         .select("username")
@@ -447,6 +452,7 @@ export const useAnimeStore = defineStore("anime", {
                         submitterUsername = profileData.username;
                     }
                 }
+                // If both fail, submitterUsername remains "Unknown"
 
                 return {
                     id: data.id,

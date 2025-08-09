@@ -12,6 +12,90 @@
                 </p>
             </div>
 
+            <!-- Data Status & Refresh -->
+            <div class="mb-6">
+                <div class="card p-4">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <!-- Cache Status with improved loading state -->
+                            <span
+                                class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium transition-all duration-200"
+                                :class="{
+                                    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200':
+                                        !loading,
+                                    'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': loading
+                                }"
+                            >
+                                <div
+                                    class="w-2 h-2 rounded-full transition-all duration-200"
+                                    :class="{
+                                        'bg-green-600 dark:bg-green-400': !loading,
+                                        'bg-blue-600 dark:bg-blue-400 animate-pulse': loading
+                                    }"
+                                ></div>
+                                {{ loading ? "Loading..." : "Data Loaded" }}
+                            </span>
+
+                            <!-- Active Filters -->
+                            <span v-if="hasActiveFilters" class="text-sm text-gray-600 dark:text-gray-400"
+                                >Active filters:</span
+                            >
+
+                            <span
+                                v-if="selectedCategory !== 'all'"
+                                data-testid="filter-tag-category"
+                                class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 dark:from-blue-900/50 dark:to-indigo-900/50 dark:text-blue-200 border border-blue-200 dark:border-blue-700 shadow-sm"
+                            >
+                                <div class="w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full flex-shrink-0"></div>
+                                <span class="font-semibold">{{ displaySelectedCategory }}</span>
+                            </span>
+
+                            <span
+                                v-if="selectedYear !== 'all'"
+                                data-testid="filter-tag-year"
+                                class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 dark:from-green-900/50 dark:to-emerald-900/50 dark:text-green-200 border border-green-200 dark:border-green-700 shadow-sm"
+                            >
+                                <div class="w-2 h-2 bg-green-600 dark:bg-green-400 rounded-full flex-shrink-0"></div>
+                                <span class="font-semibold">{{ selectedYear }}</span>
+                            </span>
+
+                            <span
+                                v-if="rankingCriteria !== 'post_count'"
+                                data-testid="filter-tag-criteria"
+                                class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-purple-100 to-violet-100 text-purple-800 dark:from-purple-900/50 dark:to-violet-900/50 dark:text-purple-200 border border-purple-200 dark:border-purple-700 shadow-sm"
+                            >
+                                <div class="w-2 h-2 bg-purple-600 dark:bg-purple-400 rounded-full flex-shrink-0"></div>
+                                <span class="font-semibold">{{ getCriteriaLabel(rankingCriteria) }}</span>
+                            </span>
+                        </div>
+
+                        <!-- Refresh Button -->
+                        <button
+                            @click="refresh"
+                            :disabled="loading"
+                            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+                            data-testid="refresh-button"
+                        >
+                            <svg
+                                class="w-4 h-4"
+                                :class="{ 'animate-spin': loading }"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                                />
+                            </svg>
+                            {{ loading ? "Refreshing..." : "Refresh Data" }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Filter and Sort Section -->
             <div
                 class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-6"
@@ -29,7 +113,7 @@
                         >
                             <option value="post_count">Jumlah Post Terbanyak</option>
                             <option value="total_views">Total Views Terbanyak</option>
-                            <option value="total_downloads">Total Downloads Terbanyak</option>
+
                             <option value="total_likes">Total Likes Terbanyak</option>
                             <option value="highest_rating">Rating MyAnimeList Tertinggi</option>
                             <option value="combined_score">Kombinasi Score</option>
@@ -47,9 +131,27 @@
                             @change="handleCategoryChange"
                         >
                             <option value="all">Semua Kategori</option>
-                            <option v-for="category in categories" :key="category.id" :value="category.id">
-                                {{ category.name }}
-                            </option>
+                            
+                            <!-- Tampilkan semua kategori jika tidak ada struktur hierarkis -->
+                            <template v-if="parentCategories.length === 0">
+                                <option v-for="category in categories.filter(cat => cat.id !== 'all')" :key="category.id" :value="category.id">
+                                    {{ category.parent_id ? '　' : '' }}{{ category.name }}
+                                </option>
+                            </template>
+                            
+                            <!-- Tampilkan dengan struktur hierarkis -->
+                            <template v-else>
+                                <optgroup v-for="parentCategory in parentCategories" :key="parentCategory.id" :label="parentCategory.name">
+                                    <!-- Option untuk "Semua [Parent Category]" -->
+                                    <option :value="parentCategory.id">
+                                        Semua {{ parentCategory.name }}
+                                    </option>
+                                    <!-- Subkategori -->
+                                    <option v-for="childCategory in getChildCategories(parentCategory.id)" :key="childCategory.id" :value="childCategory.id">
+                                        {{ childCategory.name }}
+                                    </option>
+                                </optgroup>
+                            </template>
                         </select>
                     </div>
 
@@ -169,50 +271,41 @@
                                             <StarIcon class="w-4 h-4 text-yellow-400 fill-current" />
                                             {{ anime.rating.toFixed(1) }}
                                         </span>
-                                        <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs font-medium">
-                                            {{ anime.category }}
+                                        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 dark:from-blue-900/50 dark:to-indigo-900/50 dark:text-blue-200 border border-blue-200 dark:border-blue-700 shadow-sm">
+                                            <div class="w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full flex-shrink-0"></div>
+                                            <span class="font-semibold">{{ anime.category }}</span>
                                         </span>
                                     </div>
                                 </div>
 
                                 <!-- Statistics -->
-                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <div class="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                        <div class="flex items-center justify-center gap-1 mb-1">
-                                            <FilmIcon class="w-4 h-4 text-blue-500" />
-                                            <span class="text-xs font-medium text-gray-600 dark:text-gray-400">Posts</span>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                        <div class="flex items-center justify-center gap-2 mb-2">
+                                            <FilmIcon class="w-5 h-5 text-blue-500" />
+                                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Posts</span>
                                         </div>
-                                        <div class="text-lg font-bold text-gray-900 dark:text-white">
+                                        <div class="text-xl font-bold text-gray-900 dark:text-white">
                                             {{ formatNumber(anime.postCount) }}
                                         </div>
                                     </div>
 
-                                    <div class="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                        <div class="flex items-center justify-center gap-1 mb-1">
-                                            <EyeIcon class="w-4 h-4 text-green-500" />
-                                            <span class="text-xs font-medium text-gray-600 dark:text-gray-400">Views</span>
+                                    <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                        <div class="flex items-center justify-center gap-2 mb-2">
+                                            <EyeIcon class="w-5 h-5 text-green-500" />
+                                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Views</span>
                                         </div>
-                                        <div class="text-lg font-bold text-gray-900 dark:text-white">
+                                        <div class="text-xl font-bold text-gray-900 dark:text-white">
                                             {{ formatNumber(anime.totalViews) }}
                                         </div>
                                     </div>
 
-                                    <div class="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                        <div class="flex items-center justify-center gap-1 mb-1">
-                                            <ArrowDownTrayIcon class="w-4 h-4 text-purple-500" />
-                                            <span class="text-xs font-medium text-gray-600 dark:text-gray-400">Downloads</span>
+                                    <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                        <div class="flex items-center justify-center gap-2 mb-2">
+                                            <HeartIcon class="w-5 h-5 text-red-500" />
+                                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Likes</span>
                                         </div>
-                                        <div class="text-lg font-bold text-gray-900 dark:text-white">
-                                            {{ formatNumber(anime.totalDownloads) }}
-                                        </div>
-                                    </div>
-
-                                    <div class="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                        <div class="flex items-center justify-center gap-1 mb-1">
-                                            <HeartIcon class="w-4 h-4 text-red-500" />
-                                            <span class="text-xs font-medium text-gray-600 dark:text-gray-400">Likes</span>
-                                        </div>
-                                        <div class="text-lg font-bold text-gray-900 dark:text-white">
+                                        <div class="text-xl font-bold text-gray-900 dark:text-white">
                                             {{ formatNumber(anime.totalLikes) }}
                                         </div>
                                     </div>
@@ -228,7 +321,7 @@
                                             </span>
                                         </div>
                                         <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                                            Berdasarkan views + downloads + likes
+                                            Berdasarkan views + likes
                                         </div>
                                     </div>
                                 </div>
@@ -320,10 +413,7 @@
                                             <EyeIcon class="w-3 h-3" />
                                             {{ formatNumber(post.views || 0) }}
                                         </span>
-                                        <span class="flex items-center gap-1">
-                                            <ArrowDownTrayIcon class="w-3 h-3" />
-                                            {{ formatNumber(post.downloads || 0) }}
-                                        </span>
+
                                     </div>
                                 </div>
                             </div>
@@ -346,7 +436,6 @@ import {
     ExclamationTriangleIcon,
     StarIcon,
     EyeIcon,
-    ArrowDownTrayIcon,
     HeartIcon
 } from "@heroicons/vue/24/outline";
 
@@ -396,6 +485,49 @@ const selectedAnimeTitle = ref("");
 
 // Computed properties
 const categories = computed(() => animeStore.categories.filter(cat => cat.id !== "all"));
+
+// Enhanced computed properties for hierarchical categories
+const parentCategories = computed(() => {
+    return animeStore.categories.filter(cat => !cat.parent_id && cat.id !== "all");
+});
+
+const getChildCategories = (parentId: string) => {
+    return animeStore.categories.filter(cat => cat.parent_id === parentId);
+};
+
+// Computed property untuk menampilkan nama kategori yang dipilih
+const displaySelectedCategory = computed(() => {
+    // Jika kategori adalah "all", gunakan kategori dari database
+    if (selectedCategory.value === "all") {
+        // Cari kategori dengan id "all" di database
+        const allCategory = animeStore.categories.find(cat => cat.id === "all");
+        return allCategory?.name ?? "Semua Kategori";
+    }
+
+    // Cari kategori yang dipilih berdasarkan ID
+    const category = animeStore.categories.find(cat => cat.id === selectedCategory.value);
+
+    if (!category) {
+        // Jika kategori tidak ditemukan, gunakan kategori "all" dari database
+        const allCategory = animeStore.categories.find(cat => cat.id === "all");
+        return allCategory?.name ?? "Semua Kategori";
+    }
+
+    // Jika ini adalah subkategori, tampilkan dengan format "Parent > Subcategory"
+    if (category.parent_id) {
+        const parentCategory = animeStore.categories.find(cat => cat.id === category.parent_id);
+        if (parentCategory) {
+            return `${parentCategory.name} > ${category.name}`;
+        }
+    }
+
+    // Jika kategori utama atau tidak ditemukan parent-nya
+    return category.name;
+});
+
+const hasActiveFilters = computed(() => {
+    return selectedCategory.value !== "all" || selectedYear.value !== "all" || rankingCriteria.value !== "post_count";
+});
 
 // Methods
 const loadTopRatedAnimes = async () => {
@@ -473,7 +605,7 @@ useHead({
         {
             name: "description",
             content:
-                "Temukan anime terpopuler dan top rated berdasarkan berbagai kriteria seperti jumlah post, views, downloads, dan rating MyAnimeList."
+                "Temukan anime terpopuler dan top rated berdasarkan berbagai kriteria seperti jumlah post, views, likes, dan rating MyAnimeList."
         },
         {
             property: "og:title",

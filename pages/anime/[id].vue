@@ -114,35 +114,52 @@
                                                 <EyeIcon class="w-4 h-4 mr-1" />
                                                 <span>Total Views</span>
                                             </div>
-                                            <span class="font-medium">{{ formatNumber(anime?.views) }}</span>
-                                        </div>
-                                        <div class="flex items-center justify-between text-sm">
-                                            <div class="flex items-center text-green-600 dark:text-green-400">
-                                                <ArrowDownTrayIcon class="w-4 h-4 mr-1" />
-                                                <span>Total Downloads</span>
-                                            </div>
-                                            <span class="font-medium">{{ formatNumber(anime?.downloads) }}</span>
+                                            <span class="font-medium text-gray-900 dark:text-gray-100">{{ formatNumber(anime?.views) }}</span>
                                         </div>
                                         <div class="flex items-center justify-between text-sm">
                                             <div class="flex items-center text-red-500 dark:text-red-400">
                                                 <HeartIcon class="w-4 h-4 mr-1" />
                                                 <span>Likes</span>
                                             </div>
-                                            <span class="font-medium">{{ anime?.likes ?? 0 }}</span>
+                                            <span class="font-medium text-gray-900 dark:text-gray-100">{{ likesCount }}</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Action Buttons -->
                                 <div class="mt-6 space-y-3">
-                                    <button class="w-full btn-primary flex items-center justify-center">
-                                        <PlayIcon class="w-5 h-5 mr-2" />
-                                        Watch Now
+                                    <!-- Like Button - Hidden if user is submitter -->
+                                    <button 
+                                        v-if="!isUserSubmitter"
+                                        @click="toggleLike"
+                                        :disabled="!authStore.isAuthenticated || likePending"
+                                        class="w-full flex items-center justify-center transition-all duration-200"
+                                        :class="[
+                                            authStore.isAuthenticated 
+                                                ? (isLiked 
+                                                    ? 'btn-primary bg-red-600 hover:bg-red-700 border-red-600' 
+                                                    : 'btn-secondary hover:bg-red-50 hover:border-red-300 dark:hover:bg-red-900/20')
+                                                : 'btn-disabled cursor-not-allowed opacity-50'
+                                        ]"
+                                    >
+                                        <HeartIcon 
+                                            :class="[
+                                                'w-5 h-5 mr-2 transition-all duration-200',
+                                                isLiked ? 'fill-current text-white' : 'text-red-500'
+                                            ]" 
+                                        />
+                                        <span v-if="likePending">Processing...</span>
+                                        <span v-else-if="!authStore.isAuthenticated">Login to Like</span>
+                                        <span v-else>{{ isLiked ? 'Unlike' : 'Like' }} ({{ likesCount }})</span>
                                     </button>
-                                    <button class="w-full btn-secondary flex items-center justify-center">
-                                        <BookmarkIcon class="w-5 h-5 mr-2" />
-                                        Add to Watchlist
-                                    </button>
+                                    
+                                    <!-- Message for submitter -->
+                                    <div v-if="isUserSubmitter" class="w-full p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-center">
+                                        <p class="text-sm text-blue-700 dark:text-blue-300">
+                                            <UserIcon class="w-4 h-4 inline mr-1" />
+                                            Ini adalah postingan Anda
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -682,7 +699,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import { useAnimeStore } from "~/stores/anime";
 import { useAuthStore } from "~/stores/auth";
@@ -691,9 +708,6 @@ import {
     StarIcon,
     EyeIcon,
     HeartIcon,
-    ArrowDownTrayIcon,
-    PlayIcon,
-    BookmarkIcon,
     UserIcon,
     CalendarIcon,
     ChevronRightIcon,
@@ -709,6 +723,20 @@ const authStore = useAuthStore();
 // Reactive state
 const loading = ref(true);
 const animeData = ref(null);
+
+// Like and View state
+const isLiked = ref(false);
+const likesCount = ref(0);
+const likePending = ref(false);
+const viewTracked = ref(false);
+const viewTimer = ref(null);
+
+// Computed properties
+const isUserSubmitter = computed(() => {
+    return authStore.isAuthenticated && 
+           animeData.value && 
+           authStore.currentUser?.id === animeData.value.submitter_id;
+});
 
 // Comments state
 const comments = ref([]);
@@ -754,6 +782,11 @@ async function fetchAnimeData() {
         const found = result !== undefined && result !== null;
         animeData.value = result as Anime | null;
 
+        // Update likes count from fetched data
+        if (animeData.value) {
+            likesCount.value = animeData.value.likes || 0;
+        }
+
         // If no result found, return false to indicate we need to fetch again
         return found;
     } catch (error) {
@@ -761,6 +794,108 @@ async function fetchAnimeData() {
         return false;
     } finally {
         loading.value = false;
+    }
+}
+
+// Check if user has liked this anime
+async function checkLikeStatus() {
+    if (!authStore.isAuthenticated || !animeData.value) return;
+    
+    try {
+        const response = await $fetch(`/api/posts/${animeData.value.id}/like-status`);
+        isLiked.value = response.isLiked;
+    } catch (error) {
+        console.error('Error checking like status:', error);
+    }
+}
+
+// Check if user has already viewed this anime
+async function checkViewStatus() {
+    if (!animeData.value) return;
+    
+    try {
+        const response = await $fetch(`/api/posts/${animeData.value.id}/view-status`);
+        if (response.hasViewed) {
+            viewTracked.value = true;
+            console.log('View already tracked:', response.reason);
+        }
+    } catch (error) {
+        console.error('Error checking view status:', error);
+    }
+}
+
+// Toggle like functionality
+async function toggleLike() {
+    if (!authStore.isAuthenticated || !animeData.value || likePending.value) return;
+    
+    likePending.value = true;
+    
+    try {
+        const response = await $fetch(`/api/posts/${animeData.value.id}/like`, {
+            method: 'POST'
+        });
+        
+        if (response.success) {
+            isLiked.value = response.isLiked;
+            likesCount.value = response.likesCount;
+            
+            // Update anime data
+            if (animeData.value) {
+                animeData.value.likes = response.likesCount;
+            }
+        }
+    } catch (error: any) {
+        console.error('Error toggling like:', error);
+        
+        // Handle specific error cases
+        if (error.statusCode === 403) {
+            alert('Anda tidak dapat like postingan Anda sendiri.');
+        } else if (error.statusCode === 401) {
+            alert('Anda harus login untuk memberikan like.');
+        } else {
+            alert('Gagal memberikan like. Silakan coba lagi.');
+        }
+    } finally {
+        likePending.value = false;
+    }
+}
+
+// Track view after 5 seconds
+function startViewTracking() {
+    if (viewTracked.value || !animeData.value) return;
+    
+    // Clear any existing timer
+    if (viewTimer.value) {
+        clearTimeout(viewTimer.value);
+    }
+    
+    // Set timer for 5 seconds
+    viewTimer.value = setTimeout(async () => {
+        if (!viewTracked.value && animeData.value) {
+            await trackView();
+        }
+    }, 5000);
+}
+
+// Track view functionality
+async function trackView() {
+    if (viewTracked.value || !animeData.value) return;
+    
+    try {
+        const response = await $fetch(`/api/posts/${animeData.value.id}/view`, {
+            method: 'POST'
+        });
+        
+        if (response.success) {
+            viewTracked.value = true;
+            
+            // Update anime data with new view count
+            if (animeData.value) {
+                animeData.value.views = response.viewsCount;
+            }
+        }
+    } catch (error) {
+        console.error('Error tracking view:', error);
     }
 }
 
@@ -1324,6 +1459,22 @@ onMounted(async () => {
         await fetchAnimeData();
     }
 
+    // Initialize like status and view tracking if anime data is available
+    if (animeData.value) {
+        // Check like status for authenticated users
+        if (authStore.isAuthenticated) {
+            await checkLikeStatus();
+        }
+        
+        // Check if user has already viewed this anime
+        await checkViewStatus();
+        
+        // Start view tracking (5 second timer) only if not already viewed
+        if (!viewTracked.value) {
+            startViewTracking();
+        }
+    }
+
     // Initialize comment author with username if authenticated
     if (authStore.isAuthenticated && authStore.currentUser?.username) {
         newComment.value.author = authStore.currentUser.username;
@@ -1332,6 +1483,15 @@ onMounted(async () => {
     // Load comments for this anime
     if (process.client) {
         loadComments();
+    }
+});
+
+// Cleanup on unmount
+onUnmounted(() => {
+    // Clear view tracking timer
+    if (viewTimer.value) {
+        clearTimeout(viewTimer.value);
+        viewTimer.value = null;
     }
 });
 </script>
