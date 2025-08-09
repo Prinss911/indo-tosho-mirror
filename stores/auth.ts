@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed, readonly } from "vue";
+import { useToast } from "vue-toastification";
 import { useSupabase } from "~/services/supabaseClient";
 import { sanitizeAuthError } from "~/utils/sanitization";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
@@ -190,6 +191,8 @@ export const useAuthStore = defineStore("auth", () => {
             };
 
             lastActivity.value = Date.now();
+            const toast = useToast();
+            toast.success(`Selamat datang, ${user.value.username}!`);
             return { success: true };
         } catch (err) {
             // Don't log sensitive error information
@@ -282,8 +285,10 @@ export const useAuthStore = defineStore("auth", () => {
         error.value = null;
 
         try {
-            // Silent logout - hanya membersihkan local state tanpa memanggil Supabase API
-            // untuk menghindari ERR_ABORTED error
+            // Panggil Supabase signOut untuk mengakhiri sesi di server dan membersihkan semua data sesi terkait di sisi klien.
+            await supabase.auth.signOut();
+
+
             
             // Invalidate session if exists (tetap panggil API internal untuk cleanup)
             if (sessionId.value) {
@@ -305,35 +310,12 @@ export const useAuthStore = defineStore("auth", () => {
             lastActivity.value = Date.now();
             clearCache();
 
-            // Clear semua stored tokens dan session data dari browser storage
-            if (typeof window !== 'undefined') {
-                try {
-                    // Clear localStorage items
-                    localStorage.removeItem('supabase.auth.token');
-                    localStorage.removeItem('sb-jayavvymuqkkvvlcaudv-auth-token');
-                    
-                    // Clear sessionStorage items juga
-                    sessionStorage.removeItem('supabase.auth.token');
-                    sessionStorage.removeItem('sb-jayavvymuqkkvvlcaudv-auth-token');
-                    
-                    // Clear semua keys yang mengandung 'supabase' atau 'auth'
-                    const keysToRemove = [];
-                    for (let i = 0; i < localStorage.length; i++) {
-                        const key = localStorage.key(i);
-                        if (key && (key.includes('supabase') || key.includes('auth'))) {
-                            keysToRemove.push(key);
-                        }
-                    }
-                    keysToRemove.forEach(key => localStorage.removeItem(key));
-                    
-                } catch (storageErr) {
-                    // Ignore localStorage errors - tidak critical
-                    console.warn('Storage cleanup failed:', storageErr);
-                }
-            }
+
 
             // Berhasil logout tanpa error
             console.log('Silent logout completed successfully');
+            const toast = useToast();
+            toast.success("Anda telah berhasil keluar.");
 
         } catch (err) {
             // Bahkan jika ada error, tetap clear local state untuk UX yang baik
@@ -343,6 +325,8 @@ export const useAuthStore = defineStore("auth", () => {
             lastActivity.value = Date.now();
             
             console.warn('Logout error occurred, but local state cleared for good UX:', err);
+            const toast = useToast();
+            toast.error("Terjadi kesalahan saat keluar. Silakan coba lagi.");
             // Tidak set error.value agar user tidak melihat error message
         } finally {
             isLoading.value = false;
