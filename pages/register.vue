@@ -556,7 +556,7 @@ import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "~/stores/auth";
 import { FilmIcon, EyeIcon, EyeSlashIcon, ExclamationTriangleIcon, CheckCircleIcon } from "@heroicons/vue/24/outline";
-import { sanitizeInput, sanitizeEmail, sanitizeUsername } from "~/utils/input-sanitizer";
+import { sanitizeInput, sanitizeEmail, sanitizeUsername } from "~/utils/sanitization";
 
 // Meta
 definePageMeta({

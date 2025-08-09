@@ -942,6 +942,7 @@ import { useAuthStore } from "~/stores/auth";
 import { useAnimeStore } from "~/stores/anime";
 import { jikanApi, type JikanAnime } from "~/services/jikanApi";
 import { useToast } from "vue-toastification";
+import { formatMarkdownDescription } from "~/utils/markdown-formatter";
 import {
     ArrowLeftIcon,
     MagnifyingGlassIcon,
@@ -1384,42 +1385,8 @@ const insertFormat = (before: string, after: string, placeholder: string) => {
     });
 };
 
-const formatDescription = (text: string): string => {
-    if (!text) return "";
-
-    return (
-        text
-            // Bold text
-            .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-            // Italic text
-            .replace(/\*(.*?)\*/g, "<em>$1</em>")
-            // Links
-            .replace(
-                /\[([^\]]+)\]\(([^)]+)\)/g,
-                '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">$1</a>'
-            )
-            // Code blocks
-            .replace(
-                /```([\s\S]*?)```/g,
-                '<pre class="bg-gray-100 dark:bg-gray-800 p-3 rounded-md overflow-x-auto"><code>$1</code></pre>'
-            )
-            // Inline code
-            .replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm">$1</code>')
-            // Horizontal rules
-            .replace(/^---$/gm, '<hr class="my-4 border-gray-300 dark:border-gray-600">')
-            // Unordered lists
-            .replace(/^- (.+)$/gm, '<li class="ml-4">• $1</li>')
-            // Ordered lists
-            .replace(/^\d+\. (.+)$/gm, '<li class="ml-4 list-decimal">$1</li>')
-            // Blockquotes
-            .replace(
-                /^> (.+)$/gm,
-                '<blockquote class="border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic text-gray-700 dark:text-gray-300">$1</blockquote>'
-            )
-            // Line breaks
-            .replace(/\n/g, "<br>")
-    );
-};
+// Alias untuk kompatibilitas dengan template yang sudah ada
+const formatDescription = formatMarkdownDescription;
 
 const showConfirmationModal = () => {
     // Validate only manual fields before showing modal

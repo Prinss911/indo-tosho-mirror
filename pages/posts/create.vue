@@ -929,7 +929,7 @@ import { useAnimeStore } from "~/stores/anime";
 import { jikanApi, type JikanAnime } from "~/services/jikanApi";
 import { useApi } from "~/composables/useApi";
 import { useToast } from "vue-toastification";
-import { sanitizeInput, sanitizeUrl, sanitizeTextarea } from "~/utils/input-sanitizer";
+import { sanitizeInput, sanitizeUrl, sanitizeTextarea } from "~/utils/sanitization";
 import {
     ArrowLeftIcon,
     MagnifyingGlassIcon,

@@ -1,4 +1,5 @@
-import { useSupabase } from "~/services/supabaseClient";
+// Client-side API functions untuk top-rated anime
+// File ini berisi fungsi-fungsi yang dapat diimpor oleh composables
 
 export interface TopRatedAnime {
     title: string;
@@ -30,146 +31,30 @@ export interface TopRatedResponse {
 }
 
 /**
- * API endpoint untuk mendapatkan anime top rated berdasarkan berbagai kriteria
+ * Fungsi untuk mendapatkan anime top rated berdasarkan berbagai kriteria
  */
 export async function getTopRatedAnimes(params: TopRatedParams): Promise<TopRatedResponse> {
     try {
-        const { client: supabase } = useSupabase();
+        const queryParams = new URLSearchParams();
         
-        // Build query untuk mengambil posts yang published
-        let query = supabase
-            .from('posts')
-            .select('*')
-            .eq('status_approval', 'published');
+        if (params.criteria) queryParams.append('criteria', params.criteria);
+        if (params.category && params.category !== 'all') queryParams.append('category', params.category);
+        if (params.year) queryParams.append('year', params.year.toString());
+        if (params.limit) queryParams.append('limit', params.limit.toString());
 
-        // Apply category filter jika ada
-        if (params.category && params.category !== 'all') {
-            query = query.eq('category_id', params.category);
-        }
-
-        // Apply year filter jika ada
-        if (params.year) {
-            query = query.eq('year', params.year);
-        }
-
-        const { data: posts, error } = await query;
-
-        if (error) {
-            console.error('Error fetching posts:', error);
-            return {
-                success: false,
-                error: 'Gagal mengambil data posts'
-            };
-        }
-
-        if (!posts || posts.length === 0) {
-            return {
-                success: true,
-                data: [],
-                total: 0
-            };
-        }
-
-        // Fetch category names untuk mapping
-        const { data: categories, error: categoriesError } = await supabase
-            .from('categories')
-            .select('id, name');
-
-        const categoryMap = new Map();
-        if (!categoriesError && categories) {
-            categories.forEach(cat => {
-                categoryMap.set(cat.id, cat.name);
-            });
-        }
-
-        // Group posts by title dan hitung statistik
-        const animeGroups = new Map<string, TopRatedAnime>();
-        
-        posts.forEach(post => {
-            const title = post.title;
-            
-            if (!animeGroups.has(title)) {
-                animeGroups.set(title, {
-                    title,
-                    coverImage: post.cover,
-                    year: post.year,
-                    episodes: post.episodes,
-                    rating: post.rating,
-                    category: categoryMap.get(post.category_id) || 'Unknown',
-                    postCount: 0,
-                    totalViews: 0,
-                    totalDownloads: 0,
-                    totalLikes: 0,
-                    combinedScore: 0,
-                    posts: []
-                });
-            }
-            
-            const group = animeGroups.get(title)!;
-            group.posts.push(post);
-            group.postCount++;
-            group.totalViews += post.views || 0;
-            group.totalDownloads += post.downloads || 0;
-            group.totalLikes += post.likes || 0;
-            
-            // Update dengan data terbaru/terbaik
-            if (!group.coverImage && post.cover) group.coverImage = post.cover;
-            if (!group.year && post.year) group.year = post.year;
-            if (!group.episodes && post.episodes) group.episodes = post.episodes;
-            if (!group.rating && post.rating) group.rating = post.rating;
-            if (!group.category && post.category_id) {
-                group.category = categoryMap.get(post.category_id) || 'Unknown';
-            }
-        });
-
-        // Convert Map to Array dan hitung combined score
-        let groupedAnimes = Array.from(animeGroups.values());
-        
-        groupedAnimes.forEach(anime => {
-            anime.combinedScore = anime.totalViews + anime.totalDownloads + anime.totalLikes;
-        });
-
-        // Sort berdasarkan kriteria yang dipilih
-        groupedAnimes.sort((a, b) => {
-            switch (params.criteria) {
-                case 'post_count':
-                    return b.postCount - a.postCount;
-                case 'total_views':
-                    return b.totalViews - a.totalViews;
-                case 'total_downloads':
-                    return b.totalDownloads - a.totalDownloads;
-                case 'total_likes':
-                    return b.totalLikes - a.totalLikes;
-                case 'highest_rating':
-                    return (b.rating || 0) - (a.rating || 0);
-                case 'combined_score':
-                    return b.combinedScore - a.combinedScore;
-                default:
-                    return b.postCount - a.postCount;
-            }
-        });
-
-        // Apply limit
-        const limit = params.limit || 25;
-        const limitedResults = groupedAnimes.slice(0, limit);
-
-        return {
-            success: true,
-            data: limitedResults,
-            total: groupedAnimes.length
-        };
-
+        const response = await $fetch(`/api/top-rated?${queryParams.toString()}`);
+        return response as TopRatedResponse;
     } catch (error) {
-        console.error('Error in getTopRatedAnimes:', error);
+        console.error('Error fetching top rated animes:', error);
         return {
             success: false,
-            error: 'Terjadi kesalahan internal server'
+            error: 'Gagal mengambil data anime top rated'
         };
     }
 }
 
 /**
- * API endpoint untuk mendapatkan statistik ranking
+ * Fungsi untuk mendapatkan statistik ranking
  */
 export async function getTopRatedStats(): Promise<{
     success: boolean;
@@ -184,71 +69,19 @@ export async function getTopRatedStats(): Promise<{
     error?: string;
 }> {
     try {
-        const { client: supabase } = useSupabase();
-        
-        const { data: posts, error } = await supabase
-            .from('posts')
-            .select('title, views, downloads, likes, rating')
-            .eq('status_approval', 'published');
-
-        if (error) {
-            return {
-                success: false,
-                error: 'Gagal mengambil statistik'
-            };
-        }
-
-        if (!posts || posts.length === 0) {
-            return {
-                success: true,
-                data: {
-                    totalAnimes: 0,
-                    totalPosts: 0,
-                    totalViews: 0,
-                    totalDownloads: 0,
-                    totalLikes: 0,
-                    averageRating: 0
-                }
-            };
-        }
-
-        // Hitung unique anime titles
-        const uniqueTitles = new Set(posts.map(post => post.title));
-        
-        // Hitung total statistik
-        const totalViews = posts.reduce((sum, post) => sum + (post.views || 0), 0);
-        const totalDownloads = posts.reduce((sum, post) => sum + (post.downloads || 0), 0);
-        const totalLikes = posts.reduce((sum, post) => sum + (post.likes || 0), 0);
-        
-        // Hitung average rating dari posts yang memiliki rating
-        const postsWithRating = posts.filter(post => post.rating && post.rating > 0);
-        const averageRating = postsWithRating.length > 0 
-            ? postsWithRating.reduce((sum, post) => sum + post.rating, 0) / postsWithRating.length
-            : 0;
-
-        return {
-            success: true,
-            data: {
-                totalAnimes: uniqueTitles.size,
-                totalPosts: posts.length,
-                totalViews,
-                totalDownloads,
-                totalLikes,
-                averageRating: Math.round(averageRating * 100) / 100 // Round to 2 decimal places
-            }
-        };
-
+        const response = await $fetch('/api/top-rated?action=stats');
+        return response;
     } catch (error) {
-        console.error('Error in getTopRatedStats:', error);
+        console.error('Error fetching top rated stats:', error);
         return {
             success: false,
-            error: 'Terjadi kesalahan internal server'
+            error: 'Gagal mengambil statistik ranking'
         };
     }
 }
 
 /**
- * API endpoint untuk mendapatkan daftar tahun yang tersedia
+ * Fungsi untuk mendapatkan daftar tahun yang tersedia
  */
 export async function getAvailableYears(): Promise<{
     success: boolean;
@@ -256,50 +89,19 @@ export async function getAvailableYears(): Promise<{
     error?: string;
 }> {
     try {
-        const { client: supabase } = useSupabase();
-        
-        const { data: posts, error } = await supabase
-            .from('posts')
-            .select('year')
-            .eq('status_approval', 'published')
-            .not('year', 'is', null)
-            .gt('year', 0);
-
-        if (error) {
-            return {
-                success: false,
-                error: 'Gagal mengambil daftar tahun'
-            };
-        }
-
-        if (!posts || posts.length === 0) {
-            return {
-                success: true,
-                data: []
-            };
-        }
-
-        // Get unique years dan sort descending
-        const uniqueYears = [...new Set(posts.map(post => post.year))]
-            .filter(year => year && year > 0)
-            .sort((a, b) => b - a);
-
-        return {
-            success: true,
-            data: uniqueYears
-        };
-
+        const response = await $fetch('/api/top-rated?action=years');
+        return response;
     } catch (error) {
-        console.error('Error in getAvailableYears:', error);
+        console.error('Error fetching available years:', error);
         return {
             success: false,
-            error: 'Terjadi kesalahan internal server'
+            error: 'Gagal mengambil daftar tahun'
         };
     }
 }
 
 /**
- * API endpoint untuk mendapatkan posts terkait dengan anime tertentu
+ * Fungsi untuk mendapatkan posts terkait dengan anime tertentu
  */
 export async function getRelatedPosts(title: string): Promise<{
     success: boolean;
@@ -307,32 +109,17 @@ export async function getRelatedPosts(title: string): Promise<{
     error?: string;
 }> {
     try {
-        const { client: supabase } = useSupabase();
-        
-        const { data: posts, error } = await supabase
-            .from('posts')
-            .select('*')
-            .ilike('title', title)
-            .eq('status_approval', 'published')
-            .order('created_at', { ascending: false });
+        const queryParams = new URLSearchParams();
+        queryParams.append('action', 'related');
+        queryParams.append('title', title);
 
-        if (error) {
-            return {
-                success: false,
-                error: 'Gagal mengambil posts terkait'
-            };
-        }
-
-        return {
-            success: true,
-            data: posts || []
-        };
-
+        const response = await $fetch(`/api/top-rated?${queryParams.toString()}`);
+        return response;
     } catch (error) {
-        console.error('Error in getRelatedPosts:', error);
+        console.error('Error fetching related posts:', error);
         return {
             success: false,
-            error: 'Terjadi kesalahan internal server'
+            error: 'Gagal mengambil posts terkait'
         };
     }
 }

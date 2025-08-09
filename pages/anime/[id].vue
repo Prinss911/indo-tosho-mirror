@@ -703,7 +703,7 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import { useAnimeStore } from "~/stores/anime";
 import { useAuthStore } from "~/stores/auth";
-import { sanitizeTextarea, sanitizeInput } from "~/utils/input-sanitizer";
+import { sanitizeTextarea, sanitizeInput } from "~/utils/sanitization";
 import {
     StarIcon,
     EyeIcon,
@@ -999,134 +999,11 @@ const formatNumber = (num: number | null | undefined) => {
     return num.toString();
 };
 
-// Format description function for post description
-const formatDescription = (text: string) => {
-    if (!text) return "";
+// Import utilitas markdown formatter terpusat
+import { formatMarkdownDescription } from "~/utils/markdown-formatter";
 
-    // Split text into lines for better processing
-    const lines = text.split("\n");
-    const processedLines: string[] = [];
-    let inUnorderedList = false;
-    let inOrderedList = false;
-    let inCodeBlock = false;
-    let codeBlockContent = "";
-
-    for (let i = 0; i < lines.length; i++) {
-        let line = lines[i];
-
-        // Handle code blocks
-        if (line.trim().startsWith("```")) {
-            if (inCodeBlock) {
-                // End code block
-                processedLines.push(
-                    `<pre class="bg-gray-100 dark:bg-gray-800 p-3 rounded-md overflow-x-auto my-4"><code>${codeBlockContent}</code></pre>`
-                );
-                codeBlockContent = "";
-                inCodeBlock = false;
-            } else {
-                // Start code block
-                inCodeBlock = true;
-            }
-            continue;
-        }
-
-        if (inCodeBlock) {
-            codeBlockContent += (codeBlockContent ? "\n" : "") + line;
-            continue;
-        }
-
-        // Handle unordered lists
-        if (line.trim().match(/^\* (.+)$/)) {
-            if (!inUnorderedList) {
-                if (inOrderedList) {
-                    processedLines.push("</ol>");
-                    inOrderedList = false;
-                }
-                processedLines.push('<ul class="list-disc list-inside space-y-1 my-4">');
-                inUnorderedList = true;
-            }
-            const content = line.trim().replace(/^\* (.+)$/, "$1");
-            processedLines.push(`<li class="ml-4">${formatInlineElements(content)}</li>`);
-            continue;
-        }
-
-        // Handle ordered lists
-        if (line.trim().match(/^\d+\. (.+)$/)) {
-            if (!inOrderedList) {
-                if (inUnorderedList) {
-                    processedLines.push("</ul>");
-                    inUnorderedList = false;
-                }
-                processedLines.push('<ol class="list-decimal list-inside space-y-1 my-4">');
-                inOrderedList = true;
-            }
-            const content = line.trim().replace(/^\d+\. (.+)$/, "$1");
-            processedLines.push(`<li class="ml-4">${formatInlineElements(content)}</li>`);
-            continue;
-        }
-
-        // Close lists if we're not in a list item
-        if (inUnorderedList) {
-            processedLines.push("</ul>");
-            inUnorderedList = false;
-        }
-        if (inOrderedList) {
-            processedLines.push("</ol>");
-            inOrderedList = false;
-        }
-
-        // Handle horizontal rules
-        if (line.trim() === "---") {
-            processedLines.push('<hr class="my-4 border-gray-300 dark:border-gray-600">');
-            continue;
-        }
-
-        // Handle blockquotes
-        if (line.trim().match(/^> (.+)$/)) {
-            const content = line.trim().replace(/^> (.+)$/, "$1");
-            processedLines.push(
-                `<blockquote class="border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic text-gray-600 dark:text-gray-400 my-4">${formatInlineElements(content)}</blockquote>`
-            );
-            continue;
-        }
-
-        // Handle regular paragraphs
-        if (line.trim()) {
-            processedLines.push(`<p class="mb-4">${formatInlineElements(line)}</p>`);
-        } else {
-            // Empty line - add spacing
-            processedLines.push("<br>");
-        }
-    }
-
-    // Close any remaining lists
-    if (inUnorderedList) {
-        processedLines.push("</ul>");
-    }
-    if (inOrderedList) {
-        processedLines.push("</ol>");
-    }
-
-    return processedLines.join("");
-};
-
-// Helper function to format inline elements
-const formatInlineElements = (text: string) => {
-    return (
-        text
-            // Bold text
-            .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-            // Italic text
-            .replace(/\*(.*?)\*/g, "<em>$1</em>")
-            // Links
-            .replace(
-                /\[([^\]]+)\]\(([^)]+)\)/g,
-                '<a href="$2" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">$1</a>'
-            )
-            // Inline code
-            .replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm">$1</code>')
-    );
-};
+// Alias untuk kompatibilitas dengan template yang sudah ada
+const formatDescription = formatMarkdownDescription;
 
 // Comment functions
 const parseMarkdown = (content: string) => {

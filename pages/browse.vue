@@ -268,7 +268,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAnimeStore } from "~/stores/anime";
-import { sanitizeSearchQuery } from "~/utils/input-sanitizer";
+import { sanitizeSearchQuery } from "~/utils/sanitization";
 import {
     MagnifyingGlassIcon,
     FilmIcon,

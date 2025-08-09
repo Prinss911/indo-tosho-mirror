@@ -291,36 +291,8 @@ export function validatePassword(password: string): PasswordValidationResult {
     };
 }
 
-/**
- * Sanitize error messages to prevent information disclosure
- */
-export function sanitizeAuthError(error: any): string {
-    const message = error?.message || error || "Authentication failed";
-
-    // Map specific errors to generic messages
-    const errorMappings: Record<string, string> = {
-        "Invalid login credentials": "Email atau password salah",
-        "Email not confirmed": "Email belum diverifikasi",
-        "User not found": "Email atau password salah",
-        "Invalid email": "Format email tidak valid",
-        "Password should be at least": "Password tidak memenuhi persyaratan keamanan",
-        "User already registered": "Email sudah terdaftar",
-        "Signup disabled": "Registrasi sedang ditutup",
-        "Email rate limit exceeded": "Terlalu banyak percobaan. Coba lagi nanti",
-        "Token has expired": "Kode verifikasi telah kedaluwarsa",
-        "Invalid token": "Kode verifikasi tidak valid"
-    };
-
-    // Check for mapped errors
-    for (const [key, value] of Object.entries(errorMappings)) {
-        if (message.includes(key)) {
-            return value;
-        }
-    }
-
-    // Default generic message
-    return "Terjadi kesalahan. Silakan coba lagi";
-}
+// Import sanitizeAuthError from centralized sanitization module
+export { sanitizeAuthError } from "~/utils/sanitization";
 
 /**
  * Generate secure session cookie options

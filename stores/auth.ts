@@ -1,33 +1,8 @@
 import { defineStore } from "pinia";
 import { ref, computed, readonly } from "vue";
 import { useSupabase } from "~/services/supabaseClient";
+import { sanitizeAuthError } from "~/utils/sanitization";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
-
-// Helper function to sanitize auth errors
-function sanitizeAuthError(error: any): string {
-    const message = error?.message || error || "Authentication failed";
-
-    const errorMappings: Record<string, string> = {
-        "Invalid login credentials": "Email atau password salah",
-        "Email not confirmed": "Email belum diverifikasi",
-        "User not found": "Email atau password salah",
-        "Invalid email": "Format email tidak valid",
-        "Password should be at least": "Password tidak memenuhi persyaratan keamanan",
-        "User already registered": "Email sudah terdaftar",
-        "Signup disabled": "Registrasi sedang ditutup",
-        "Email rate limit exceeded": "Terlalu banyak percobaan. Coba lagi nanti",
-        "Token has expired": "Kode verifikasi telah kedaluwarsa",
-        "Invalid token": "Kode verifikasi tidak valid"
-    };
-
-    for (const [key, value] of Object.entries(errorMappings)) {
-        if (message.includes(key)) {
-            return value;
-        }
-    }
-
-    return "Terjadi kesalahan. Silakan coba lagi";
-}
 
 export interface User {
     id: string;

@@ -701,7 +701,7 @@ import { ref, computed, onMounted } from "vue";
 import { useAuthStore } from "~/stores/auth";
 import { useSupabase } from "~/services/supabaseClient";
 import { useToast } from "vue-toastification";
-import { sanitizeSearchQuery } from "~/utils/input-sanitizer";
+import { sanitizeSearchQuery } from "~/utils/sanitization";
 import {
     ArrowLeftIcon,
     PlusIcon,

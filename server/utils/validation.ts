@@ -1,19 +1,6 @@
 import { z } from "zod";
 import { createError, getHeader } from "h3";
-
-// Conditional import untuk DOMPurify
-let DOMPurify: any = null;
-
-// Coba import DOMPurify dengan error handling untuk Cloudflare Workers
-if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-    // Development environment - gunakan DOMPurify
-    try {
-        DOMPurify = require('isomorphic-dompurify');
-    } catch (error) {
-        console.warn('DOMPurify not available, using fallback sanitization');
-    }
-}
-// Untuk production/Cloudflare Workers, gunakan fallback sanitization
+import { sanitizeHtml, sanitizeInput, sanitizeObject } from "~/utils/sanitization";
 
 // Schema validasi untuk Post data
 export const PostValidationSchema = z.object({
@@ -98,57 +85,8 @@ export const PostUpdateValidationSchema = PostValidationSchema.partial();
 // Schema untuk ID validation
 export const UUIDSchema = z.string().uuid("Invalid UUID format");
 
-/**
- * Sanitize HTML content untuk mencegah XSS
- * Menggunakan DOMPurify jika tersedia, fallback ke manual sanitization
- */
-export function sanitizeHtml(content: string): string {
-    if (!content) return "";
-
-    // Jika DOMPurify tersedia, gunakan untuk sanitization
-    if (DOMPurify && typeof DOMPurify.sanitize === 'function') {
-        try {
-            const cleanContent = DOMPurify.sanitize(content, {
-                ALLOWED_TAGS: [], // Tidak ada HTML tags yang diizinkan
-                ALLOWED_ATTR: [],
-                KEEP_CONTENT: true // Tetap simpan text content
-            });
-            return cleanContent.trim();
-        } catch (error) {
-            console.warn('DOMPurify sanitization failed, using fallback:', error);
-        }
-    }
-
-    // Fallback sanitization untuk environment yang tidak mendukung DOMPurify
-    return fallbackSanitizeHtml(content);
-}
-
-/**
- * Fallback sanitization function untuk environment tanpa DOMPurify
- * Menghapus HTML tags dan karakter berbahaya
- */
-function fallbackSanitizeHtml(content: string): string {
-    if (!content) return "";
-
-    return content
-        // Hapus semua HTML tags
-        .replace(/<[^>]*>/g, '')
-        // Hapus script tags dan content
-        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-        // Hapus style tags dan content
-        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-        // Decode HTML entities yang umum
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&amp;/g, '&')
-        .replace(/&quot;/g, '"')
-        .replace(/&#x27;/g, "'")
-        .replace(/&#x2F;/g, '/')
-        // Hapus karakter control yang berbahaya
-        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
-        // Trim whitespace
-        .trim();
-}
+// Sanitization functions are now imported from ~/utils/sanitization
+// This eliminates code duplication and centralizes sanitization logic
 
 /**
  * Sanitize dan validate post data
