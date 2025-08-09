@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { v4 as uuidv4 } from "uuid";
 import { useSupabase } from "~/services/supabaseClient";
+import { debounce } from "lodash-es";
 
 export interface Anime {
     id: string;
@@ -63,7 +64,10 @@ export const useAnimeStore = defineStore("anime", {
             categories: [] as Category[],
             categoryGroups: {},
             dataLoaded: false, // Flag untuk menandai apakah data sudah dimuat
-            categoriesLoaded: false // Flag untuk menandai apakah kategori sudah dimuat
+            categoriesLoaded: false, // Flag untuk menandai apakah kategori sudah dimuat
+            // Cache untuk optimasi performa
+            _filterCache: new Map<string, Anime[]>(),
+            _searchCache: new Map<string, Anime[]>()
         };
     },
 
@@ -235,12 +239,28 @@ export const useAnimeStore = defineStore("anime", {
         },
 
         applyFilters() {
+            // Buat cache key untuk optimasi
+            const cacheKey = JSON.stringify({
+                category: this.filter.category,
+                search: this.filter.search,
+                sortBy: this.filter.sortBy,
+                sortOrder: this.filter.sortOrder
+            });
+
+            // Cek cache terlebih dahulu
+            if (this._filterCache.has(cacheKey)) {
+                this.filteredAnimes = this._filterCache.get(cacheKey)!;
+                this.totalPages = Math.ceil(this.filteredAnimes.length / this.filter.perPage);
+                
+                // Reset ke halaman pertama jika halaman saat ini melebihi total halaman
+                if (this.filter.page > this.totalPages && this.totalPages > 0) {
+                    this.filter.page = 1;
+                }
+                return;
+            }
+
             // Filter hanya anime dengan statusApproval 'published'
             let filtered = [...this.animes].filter(anime => anime.statusApproval === "published");
-
-            // Tidak menghapus duplikasi berdasarkan judul
-            // Semua anime dengan title yang sama akan ditampilkan
-            // Duplikasi akan dibedakan berdasarkan ID unik dan release_file_name
 
             // Filter berdasarkan kategori
             if (this.filter.category !== "all") {
@@ -272,55 +292,72 @@ export const useAnimeStore = defineStore("anime", {
                 }
             }
 
-            // Filter berdasarkan pencarian (Advanced Search)
+            // Filter berdasarkan pencarian (Advanced Search) dengan optimasi
             if (this.filter.search) {
                 const searchLower = this.filter.search.toLowerCase();
-                filtered = filtered.filter(
-                    anime =>
-                        // Search in title (Japanese/Original)
-                        anime.title.toLowerCase().includes(searchLower) ||
-                        // Search in title_english
-                        (anime.titleEnglish && anime.titleEnglish.toLowerCase().includes(searchLower)) ||
-                        // Search in release_file_name
-                        (anime.releaseFileName && anime.releaseFileName.toLowerCase().includes(searchLower)) ||
-                        // Search in submitter_name
-                        anime.submitter.toLowerCase().includes(searchLower) ||
-                        // Additional search fields (kept for backward compatibility)
-                        anime.studio.toLowerCase().includes(searchLower) ||
-                        (anime.description && anime.description.toLowerCase().includes(searchLower))
-                );
+                
+                // Cek search cache
+                if (this._searchCache.has(searchLower)) {
+                    const searchResults = this._searchCache.get(searchLower)!;
+                    filtered = filtered.filter(anime => searchResults.some(result => result.id === anime.id));
+                } else {
+                    const searchResults = filtered.filter(
+                        anime =>
+                            // Search in title (Japanese/Original)
+                            anime.title.toLowerCase().includes(searchLower) ||
+                            // Search in title_english
+                            (anime.titleEnglish && anime.titleEnglish.toLowerCase().includes(searchLower)) ||
+                            // Search in release_file_name
+                            (anime.releaseFileName && anime.releaseFileName.toLowerCase().includes(searchLower)) ||
+                            // Search in submitter_name
+                            anime.submitter.toLowerCase().includes(searchLower) ||
+                            // Additional search fields (kept for backward compatibility)
+                            anime.studio.toLowerCase().includes(searchLower) ||
+                            (anime.description && anime.description.toLowerCase().includes(searchLower))
+                    );
+                    
+                    // Simpan ke search cache (batasi ukuran cache)
+                    if (this._searchCache.size > 50) {
+                        const firstKey = this._searchCache.keys().next().value;
+                        this._searchCache.delete(firstKey);
+                    }
+                    this._searchCache.set(searchLower, searchResults);
+                    filtered = searchResults;
+                }
             }
 
-            // Urutkan berdasarkan kriteria yang dipilih
-            filtered.sort((a, b) => {
-                let aValue: any, bValue: any;
-
-                switch (this.filter.sortBy) {
-                    case "title":
-                        aValue = a.title.toLowerCase();
-                        bValue = b.title.toLowerCase();
-                        break;
-                    case "rating":
-                        aValue = a.rating;
-                        bValue = b.rating;
-                        break;
-                    case "downloads":
-                        aValue = a.downloads;
-                        bValue = b.downloads;
-                        break;
-                    case "date":
-                    default: // date
-                        aValue = new Date(a.date ?? a.created_at ?? 0);
-                        bValue = new Date(b.date ?? b.created_at ?? 0);
-                        break;
+            // Urutkan berdasarkan kriteria yang dipilih dengan optimasi
+            const sortComparators = {
+                title: (a: Anime, b: Anime) => {
+                    const aValue = a.title.toLowerCase();
+                    const bValue = b.title.toLowerCase();
+                    return this.filter.sortOrder === "asc" ? 
+                        (aValue > bValue ? 1 : -1) : (aValue < bValue ? 1 : -1);
+                },
+                rating: (a: Anime, b: Anime) => {
+                    return this.filter.sortOrder === "asc" ? 
+                        a.rating - b.rating : b.rating - a.rating;
+                },
+                downloads: (a: Anime, b: Anime) => {
+                    return this.filter.sortOrder === "asc" ? 
+                        a.downloads - b.downloads : b.downloads - a.downloads;
+                },
+                date: (a: Anime, b: Anime) => {
+                    const aValue = new Date(a.date ?? a.created_at ?? 0).getTime();
+                    const bValue = new Date(b.date ?? b.created_at ?? 0).getTime();
+                    return this.filter.sortOrder === "asc" ? 
+                        aValue - bValue : bValue - aValue;
                 }
+            };
 
-                if (this.filter.sortOrder === "asc") {
-                    return aValue > bValue ? 1 : -1;
-                } else {
-                    return aValue < bValue ? 1 : -1;
-                }
-            });
+            filtered.sort(sortComparators[this.filter.sortBy] || sortComparators.date);
+
+            // Simpan ke cache (batasi ukuran cache)
+            if (this._filterCache.size > 100) {
+                const firstKey = this._filterCache.keys().next().value;
+                this._filterCache.delete(firstKey);
+            }
+            this._filterCache.set(cacheKey, filtered);
 
             this.filteredAnimes = filtered;
             this.totalPages = Math.ceil(filtered.length / this.filter.perPage);
@@ -392,12 +429,32 @@ export const useAnimeStore = defineStore("anime", {
             return category.name;
         },
 
+        // Debounced search untuk optimasi performa
+        debouncedSearch: debounce(function(this: any, searchTerm: string) {
+            this.filter.search = searchTerm;
+            this.filter.page = 1; // Reset ke halaman pertama
+            this.applyFilters();
+        }, 300),
+
+        // Clear cache untuk membebaskan memori
+        clearCache() {
+            this._filterCache.clear();
+            this._searchCache.clear();
+        },
+
         updateFilter(newFilter: Partial<AnimeFilter>) {
             // Simpan filter lama sebelum diupdate
             const oldFilter = { ...this.filter };
 
             // Update filter dengan nilai baru
             this.filter = { ...this.filter, ...newFilter };
+            
+            // Clear cache jika filter berubah signifikan
+            if (oldFilter.category !== this.filter.category || 
+                oldFilter.sortBy !== this.filter.sortBy || 
+                oldFilter.sortOrder !== this.filter.sortOrder) {
+                this.clearCache();
+            }
 
             // Reset ke halaman pertama saat filter berubah
             if ("category" in newFilter || "search" in newFilter || "sortBy" in newFilter || "sortOrder" in newFilter) {
@@ -516,6 +573,8 @@ export const useAnimeStore = defineStore("anime", {
 
         // Method untuk refresh semua data dengan force refresh
         async refreshData() {
+            // Clear cache saat refresh data
+            this.clearCache();
             this.dataLoaded = false;
             this.categoriesLoaded = false;
             await Promise.all([this.fetchCategories(true), this.fetchAnimes(true)]);

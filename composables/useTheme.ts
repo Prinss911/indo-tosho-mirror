@@ -8,9 +8,14 @@ const MEDIA_QUERY = "(prefers-color-scheme: dark)";
 // Global state
 const currentTheme = ref<ThemeMode>("system");
 const isDarkMode = ref(false);
+const isInitialized = ref(false);
 
 // Media query for system preference
 let mediaQuery: MediaQueryList | null = null;
+
+// Cache untuk optimasi
+let systemPreferenceCache: { value: boolean; timestamp: number } | null = null;
+const CACHE_DURATION = 5000; // 5 detik
 
 /**
  * Composable for managing theme state following Tailwind CSS best practices
@@ -33,13 +38,24 @@ export const useTheme = () => {
     };
 
     /**
-     * Get system preference for dark mode
+     * Get system preference for dark mode dengan caching
      */
     const getSystemPreference = (): boolean => {
-        if (typeof window !== "undefined" && window.matchMedia) {
-            return window.matchMedia(MEDIA_QUERY).matches;
+        if (typeof window === "undefined" || !window.matchMedia) {
+            return false;
         }
-        return false;
+        
+        // Gunakan cache jika masih valid
+        const now = Date.now();
+        if (systemPreferenceCache && (now - systemPreferenceCache.timestamp) < CACHE_DURATION) {
+            return systemPreferenceCache.value;
+        }
+        
+        // Update cache
+        const preference = window.matchMedia(MEDIA_QUERY).matches;
+        systemPreferenceCache = { value: preference, timestamp: now };
+        
+        return preference;
     };
 
     /**
@@ -96,9 +112,11 @@ export const useTheme = () => {
     };
 
     /**
-     * Initialize theme from localStorage or system preference
+     * Initialize theme from localStorage or system preference dengan optimasi
      */
     const initializeTheme = () => {
+        if (isInitialized.value) return; // Prevent double initialization
+        
         console.log("[Theme] Initializing theme...");
         if (typeof localStorage !== "undefined") {
             const stored = localStorage.getItem(STORAGE_KEY) as ThemeMode | null;
@@ -109,6 +127,7 @@ export const useTheme = () => {
         }
 
         updateTheme();
+        isInitialized.value = true;
     };
 
     /**
@@ -139,7 +158,7 @@ export const useTheme = () => {
     };
 
     /**
-     * Cleanup media query listener
+     * Cleanup media query listener dan cache
      */
     const cleanupMediaQuery = () => {
         if (mediaQuery) {
@@ -153,6 +172,10 @@ export const useTheme = () => {
             }
             mediaQuery = null;
         }
+        
+        // Clear cache
+        systemPreferenceCache = null;
+        isInitialized.value = false;
     };
 
     // Computed properties

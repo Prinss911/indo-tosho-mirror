@@ -3,6 +3,7 @@ import { ref, computed, readonly } from "vue";
 import { useSupabase } from "~/services/supabaseClient";
 import { sanitizeAuthError } from "~/utils/sanitization";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
+import { debounce } from "lodash-es";
 
 export interface User {
     id: string;
@@ -34,12 +35,33 @@ export const useAuthStore = defineStore("auth", () => {
     const sessionId = ref<string | null>(null);
     const csrfToken = ref<string | null>(null);
     const lastActivity = ref<number>(Date.now());
+    const sessionTimeout = ref<number>(30 * 60 * 1000); // 30 minutes
     const { client: supabase, user: supabaseUser } = useSupabase();
+    
+    // Cache untuk optimasi
+    const _userProfileCache = ref<Map<string, any>>(new Map());
+    const _validationCache = ref<Map<string, any>>(new Map());
 
-    // Getters
+    // Getters dengan memoization
     const isAuthenticated = computed(() => !!user.value);
     const isAdmin = computed(() => user.value?.role === "admin");
     const currentUser = computed(() => user.value);
+    const isSessionValid = computed(() => {
+        if (!user.value || !lastActivity.value) return false;
+        return Date.now() - lastActivity.value < sessionTimeout.value;
+    });
+    
+    // Computed untuk user info dengan caching
+    const userDisplayName = computed(() => {
+        if (!user.value) return "";
+        return user.value.username || user.value.email?.split("@")[0] || "User";
+    });
+    
+    const userInitials = computed(() => {
+        if (!user.value) return "";
+        const name = userDisplayName.value;
+        return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+    });
 
     // Actions
     const login = async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
@@ -105,17 +127,28 @@ export const useAuthStore = defineStore("auth", () => {
                 return { success: false, error: error.value };
             }
 
-            // Fetch user profile from profiles table
-            const { data: profileData, error: profileError } = await supabase
-                .from("profiles")
-                .select("username, role, created_at, status")
-                .eq("id", data.user.id)
-                .single();
+            // Fetch user profile from profiles table dengan caching
+            let profileData = _userProfileCache.value.get(data.user.id);
+            
+            if (!profileData) {
+                const { data: fetchedProfile, error: profileError } = await supabase
+                    .from("profiles")
+                    .select("username, role, created_at, status")
+                    .eq("id", data.user.id)
+                    .single();
 
-            if (profileError) {
-                // Don't log sensitive profile errors
-                error.value = "Terjadi kesalahan saat mengambil profil pengguna";
-                return { success: false, error: error.value };
+                if (profileError) {
+                    // Don't log sensitive profile errors
+                    error.value = "Terjadi kesalahan saat mengambil profil pengguna";
+                    return { success: false, error: error.value };
+                }
+                
+                profileData = fetchedProfile;
+                // Cache profile data selama 5 menit
+                _userProfileCache.value.set(data.user.id, profileData);
+                setTimeout(() => {
+                    _userProfileCache.value.delete(data.user.id);
+                }, 5 * 60 * 1000);
             }
 
             // Check user status
@@ -178,11 +211,22 @@ export const useAuthStore = defineStore("auth", () => {
                 return { success: false, error: error.value };
             }
 
-            // Validate password strength
-            const passwordValidation = await $fetch("/api/auth/validate-password", {
-                method: "POST",
-                body: { password: credentials.password }
-            }).catch(() => ({ isValid: false, errors: ["Password tidak memenuhi persyaratan keamanan"] }));
+            // Validate password strength dengan caching
+            const passwordHash = btoa(credentials.password).slice(0, 10); // Simple hash untuk cache key
+            let passwordValidation = _validationCache.value.get(passwordHash);
+            
+            if (!passwordValidation) {
+                passwordValidation = await $fetch("/api/auth/validate-password", {
+                    method: "POST",
+                    body: { password: credentials.password }
+                }).catch(() => ({ isValid: false, errors: ["Password tidak memenuhi persyaratan keamanan"] }));
+                
+                // Cache validation result selama 1 menit
+                _validationCache.value.set(passwordHash, passwordValidation);
+                setTimeout(() => {
+                    _validationCache.value.delete(passwordHash);
+                }, 60 * 1000);
+            }
 
             if (!passwordValidation.isValid) {
                 error.value = passwordValidation.errors.join(", ");
@@ -259,6 +303,7 @@ export const useAuthStore = defineStore("auth", () => {
             sessionId.value = null;
             csrfToken.value = null;
             lastActivity.value = Date.now();
+            clearCache();
 
             // Clear semua stored tokens dan session data dari browser storage
             if (typeof window !== 'undefined') {
@@ -403,8 +448,8 @@ export const useAuthStore = defineStore("auth", () => {
         checkAuth();
     }
 
-    // Session activity tracking
-    const updateActivity = () => {
+    // Session activity tracking dengan debouncing
+    const updateActivity = debounce(() => {
         if (user.value && sessionId.value) {
             lastActivity.value = Date.now();
             // Update session activity on server
@@ -413,6 +458,12 @@ export const useAuthStore = defineStore("auth", () => {
                 body: { sessionId: sessionId.value }
             }).catch(() => {});
         }
+    }, 1000); // Debounce selama 1 detik
+    
+    // Clear cache untuk membebaskan memori
+    const clearCache = () => {
+        _userProfileCache.value.clear();
+        _validationCache.value.clear();
     };
 
     // Auto-update activity every 5 minutes
@@ -433,6 +484,9 @@ export const useAuthStore = defineStore("auth", () => {
         isAuthenticated,
         isAdmin,
         currentUser,
+        isSessionValid,
+        userDisplayName,
+        userInitials,
 
         // Actions
         login,
@@ -440,6 +494,7 @@ export const useAuthStore = defineStore("auth", () => {
         logout,
         checkAuth,
         clearError,
-        updateActivity
+        updateActivity,
+        clearCache
     };
 });

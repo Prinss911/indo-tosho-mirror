@@ -1,5 +1,18 @@
 import type { TopRatedAnime, TopRatedParams, TopRatedResponse } from '~/api/top-rated';
 import { getTopRatedAnimes, getTopRatedStats, getAvailableYears, getRelatedPosts } from '~/api/top-rated';
+import { debounce } from 'lodash-es';
+
+// Cache untuk optimasi
+interface CacheEntry {
+    data: TopRatedAnime[];
+    timestamp: number;
+    params: TopRatedParams;
+}
+
+const CACHE_DURATION = 5 * 60 * 1000; // 5 menit
+const _topRatedCache = new Map<string, CacheEntry>();
+const _statsCache = ref<{ data: TopRatedStats; timestamp: number } | null>(null);
+const _yearsCache = ref<{ data: number[]; timestamp: number } | null>(null);
 
 export interface UseTopRatedOptions {
     criteria?: TopRatedParams['criteria'];
@@ -50,21 +63,38 @@ export const useTopRated = (options: UseTopRatedOptions = {}) => {
      * Fetch top rated animes berdasarkan parameter
      */
     const fetchTopRated = async (params?: Partial<TopRatedParams>) => {
+        // Update current params jika ada parameter baru
+        if (params) {
+            currentParams.value = {
+                ...currentParams.value,
+                ...params
+            };
+        }
+
+        const cacheKey = JSON.stringify(currentParams.value);
+        const now = Date.now();
+        
+        // Check cache first
+        const cached = _topRatedCache.get(cacheKey);
+        if (cached && (now - cached.timestamp) < CACHE_DURATION) {
+            topRatedAnimes.value = cached.data;
+            return;
+        }
+
         loading.value = true;
         error.value = null;
 
         try {
-            // Update current params jika ada parameter baru
-            if (params) {
-                currentParams.value = {
-                    ...currentParams.value,
-                    ...params
-                };
-            }
-
             const response = await getTopRatedAnimes(currentParams.value);
 
             if (response.success && response.data) {
+                // Cache the result
+                _topRatedCache.set(cacheKey, {
+                    data: response.data,
+                    timestamp: now,
+                    params: { ...currentParams.value }
+                });
+                
                 topRatedAnimes.value = response.data;
                 total.value = response.total || 0;
             } else {
@@ -86,10 +116,24 @@ export const useTopRated = (options: UseTopRatedOptions = {}) => {
      * Fetch statistik top rated
      */
     const fetchStats = async () => {
+        const now = Date.now();
+        
+        // Check cache first
+        if (_statsCache.value && (now - _statsCache.value.timestamp) < CACHE_DURATION) {
+            stats.value = _statsCache.value.data;
+            return;
+        }
+
         try {
             const response = await getTopRatedStats();
 
             if (response.success && response.data) {
+                // Cache the result
+                _statsCache.value = {
+                    data: response.data,
+                    timestamp: now
+                };
+                
                 stats.value = response.data;
             } else {
                 console.error('Error fetching stats:', response.error);
@@ -103,10 +147,24 @@ export const useTopRated = (options: UseTopRatedOptions = {}) => {
      * Fetch daftar tahun yang tersedia
      */
     const fetchAvailableYears = async () => {
+        const now = Date.now();
+        
+        // Check cache first
+        if (_yearsCache.value && (now - _yearsCache.value.timestamp) < CACHE_DURATION) {
+            availableYears.value = _yearsCache.value.data;
+            return;
+        }
+
         try {
             const response = await getAvailableYears();
 
             if (response.success && response.data) {
+                // Cache the result
+                _yearsCache.value = {
+                    data: response.data,
+                    timestamp: now
+                };
+                
                 availableYears.value = response.data;
             } else {
                 console.error('Error fetching available years:', response.error);
@@ -118,11 +176,14 @@ export const useTopRated = (options: UseTopRatedOptions = {}) => {
         }
     };
 
+    // Debounced versions untuk optimasi
+    const debouncedFetchTopRated = debounce(fetchTopRated, 300);
+
     /**
      * Update kriteria ranking
      */
     const updateCriteria = async (newCriteria: TopRatedParams['criteria']) => {
-        await fetchTopRated({ criteria: newCriteria });
+        await debouncedFetchTopRated({ criteria: newCriteria });
     };
 
     /**
@@ -130,7 +191,7 @@ export const useTopRated = (options: UseTopRatedOptions = {}) => {
      */
     const updateCategory = async (newCategory: string) => {
         const categoryParam = newCategory === 'all' ? undefined : newCategory;
-        await fetchTopRated({ category: categoryParam });
+        await debouncedFetchTopRated({ category: categoryParam });
     };
 
     /**
@@ -138,20 +199,30 @@ export const useTopRated = (options: UseTopRatedOptions = {}) => {
      */
     const updateYear = async (newYear: number | string) => {
         const yearParam = newYear === 'all' ? undefined : Number(newYear);
-        await fetchTopRated({ year: yearParam });
+        await debouncedFetchTopRated({ year: yearParam });
     };
 
     /**
      * Update limit hasil
      */
     const updateLimit = async (newLimit: number) => {
-        await fetchTopRated({ limit: newLimit });
+        await debouncedFetchTopRated({ limit: newLimit });
+    };
+
+    /**
+     * Clear cache function
+     */
+    const clearCache = () => {
+        _topRatedCache.clear();
+        _statsCache.value = null;
+        _yearsCache.value = null;
     };
 
     /**
      * Refresh semua data
      */
     const refresh = async () => {
+        clearCache();
         await Promise.all([
             fetchTopRated(),
             fetchStats(),
@@ -212,7 +283,8 @@ export const useTopRated = (options: UseTopRatedOptions = {}) => {
         updateYear,
         updateLimit,
         refresh,
-        reset
+        reset,
+        clearCache
     };
 };
 
